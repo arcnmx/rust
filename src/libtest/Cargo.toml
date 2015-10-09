@@ -1,0 +1,15 @@
+[package]
+name = "test"
+version = "1.0.0"
+authors = ["The Rust Project Developers"]
+
+[lib]
+name = "test"
+path = "lib.rs"
+
+[dependencies]
+std = { path = "../libstd" }
+getopts = { path = "../libgetopts" }
+serialize = { path = "../libserialize" }
+term = { path = "../libterm" }
+libc = { path = "../liblibc" }

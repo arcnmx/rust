@@ -589,6 +589,8 @@ ALL_TARGET_RULES = $(foreach target,$(CFG_TARGET), \
 
 all: $(ALL_TARGET_RULES) $(GENERATED) docs
 
+llvm: $(LLVM_CONFIG_$(CFG_HOST))
+
 ######################################################################
 # Build system documentation
 ######################################################################

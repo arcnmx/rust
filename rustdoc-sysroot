@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ -z "$RUSTDOC_RUSTDOC" ]; then
+	RUSTDOC_RUSTDOC=rustdoc
+fi
+
+DEPS=`echo "$*" | grep -Eo 'dependency=[^ ]*/deps' | sed 's/^dependency=/-L /' | head -n 1`
+exec "$RUSTDOC_RUSTDOC" $RUSTDOC_FLAGS $DEPS "$@"

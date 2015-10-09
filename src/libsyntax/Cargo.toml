@@ -1,0 +1,18 @@
+[package]
+name = "syntax"
+version = "1.0.0"
+authors = ["The Rust Project Developers"]
+
+[lib]
+name = "syntax"
+path = "lib.rs"
+doctest = false
+
+[dependencies]
+std = { path = "../libstd" }
+fmt_macros = { path = "../libfmt_macros" }
+serialize = { path = "../libserialize" }
+term = { path = "../libterm" }
+libc = { path = "../liblibc" }
+log = { path = "../liblog" }
+rustc_bitflags = { path = "../librustc_bitflags" }

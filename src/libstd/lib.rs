@@ -299,9 +299,6 @@ extern crate rustc_unicode;
 #[cfg(any(unix, windows))]
 extern crate libc;
 
-// Make std testable by not duplicating lang items and other globals. See #2912
-#[cfg(test)] extern crate std as realstd;
-
 // NB: These reexports are in the order they should be listed in rustdoc
 
 pub use core::any;
