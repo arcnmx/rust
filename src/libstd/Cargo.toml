@@ -1,0 +1,19 @@
+[package]
+name = "std"
+version = "1.0.0"
+authors = ["The Rust Project Developers"]
+
+[lib]
+name = "std"
+path = "lib.rs"
+
+[dependencies]
+core = { path = "../libcore" }
+libc = { path = "../liblibc", optional = true }
+alloc = { path = "../liballoc" }
+rand = { path = "../librand" }
+collections = { path = "../libcollections" }
+rustc_unicode = { path = "../librustc_unicode" }
+rustc_bitflags = { path = "../librustc_bitflags" }
+rust_builtin = { path = "deps/rust_builtin", optional = true }
+backtrace = { path = "deps/backtrace", optional = true }

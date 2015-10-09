@@ -1,0 +1,90 @@
+#!/bin/bash
+set -e
+
+if [ $# -lt 1 ]; then
+	echo Usage: $0 TARGET [LLVM_CONFIG]
+	echo ex: $0 x86_64-unknown-linux-gnu /usr/bin/llvm-config
+	exit 1
+fi
+
+ROOT="$PWD"
+TARGET="$1"
+
+CPUCOUNT=`grep -c ^processor /proc/cpuinfo || echo 4`
+
+PROFILE="debug"
+if [[ "$*" == *"--release"* ]]; then
+	PROFILE="release"
+	export RUSTC_FLAGS="$RUSTC_FLAGS -C codegen-units=$CPUCOUNT"
+fi
+CARGO_FLAGS="$CARGO_FLAGS -j$CPUCOUNT"
+
+if [ -z "$CARGO" ]; then
+	CARGO="cargo"
+fi
+
+if [ $# -lt 2 ]; then
+	LLVM_CONFIG="$ROOT/$TARGET/llvm/Release/bin/llvm-config"
+	shift 1
+else
+	LLVM_CONFIG="$2"
+	shift 2
+fi
+
+HOST=`$LLVM_CONFIG --host-target`
+
+export RUSTC_RUSTC="$RUSTC"
+export RUSTDOC_RUSTDOC="$RUSTDOC"
+
+export RUST_TEST_THREADS="$((CPUCOUNT * 2))"
+export RUSTC="$ROOT/rustc-sysroot"
+export RUSTDOC="$ROOT/rustdoc-sysroot"
+export RUST_TARGET_PATH="$ROOT"
+export CARGO_TARGET_DIR="$ROOT/target"
+export CFG_LLVM_LINKAGE_FILE="$CARGO_TARGET_DIR/$TARGET/llvmdeps.rs"
+export CFG_COMPILER_HOST_TRIPLE="$HOST"
+export CFG_LLVM_CONFIG="$LLVM_CONFIG"
+export CFG_LLVM_STDCPP="stdc++"
+
+FEATURES_STD="std std/rust_builtin std/compiler-rt std/backtrace"
+FEATURES_TEST="collectionstest coretest"
+FEATURES_ALLOC="alloc alloc/alloc_jemalloc alloc_system alloc_jemalloc"
+FEATURES_SECONDARY="arena fmt_macros flate getopts graphviz log rbml serialize syntax term test"
+FEATURES_RUSTC="rustc_driver rustdoc"
+FEATURES="$FEATURES_STD $FEATURES_TEST $FEATURES_ALLOC $FEATURES_SECONDARY $FEATURES_RUSTC"
+
+for pkgid in std rustc_driver rustdoc; do
+	"$CARGO" build --target "$TARGET" --features "$FEATURES" -p "$pkgid" $CARGO_FLAGS "$@"
+done
+
+RUSTC_FLAGS="$RUSTC_FLAGS --cfg rustc" "$CARGO" build --target "$TARGET" --features "$FEATURES" --bin rustc $CARGO_FLAGS "$@"
+RUSTC_FLAGS="$RUSTC_FLAGS --cfg rustdoc" "$CARGO" build --target "$TARGET" --features "$FEATURES" --bin rustdoc $CARGO_FLAGS "$@"
+"$CARGO" build --target "$TARGET" --features "$FEATURES" --bin compiletest $CARGO_FLAGS "$@"
+"$CARGO" build --target "$TARGET" --features "$FEATURES" --bin error-index-generator $CARGO_FLAGS "$@"
+
+if [ -z "$RUSTDOC_RUSTDOC" ]; then
+	RUSTDOC_RUSTDOC=`which rustdoc`
+fi
+cp -a "$RUSTDOC_RUSTDOC" "$CARGO_TARGET_DIR/rustdoc"
+export RUSTDOC_RUSTDOC="$CARGO_TARGET_DIR/rustdoc"
+
+"$CARGO" build --target "$TARGET" --features "$FEATURES" -p test $CARGO_FLAGS "$@"
+for crate in src/*/Cargo.toml; do
+	cratename=`basename $(dirname $crate)`
+	crate=${cratename#lib}
+
+	case $crate in
+		compiletest | error-index-generator)
+			continue
+			;;
+		*)
+			;;
+	esac
+
+	"$CARGO" test --target "$TARGET" --features "$FEATURES" -p "$crate" $CARGO_FLAGS "$@"
+done
+
+SYSROOT="$CARGO_TARGET_DIR/lib/rustlib/$TARGET"
+mkdir -p "$SYSROOT"
+ln -sf "$CARGO_TARGET_DIR/$TARGET/$PROFILE/deps" "$SYSROOT/lib"
+echo RUSTC_SYSROOT="$CARGO_TARGET_DIR"

@@ -149,7 +149,7 @@
 //! labelled with the &sube; character (specified using the HTML character
 //! entity `&sube`).
 //!
-//! ```rust
+//! ```ignore
 //! #![feature(rustc_private, core, into_cow)]
 //!
 //! use std::borrow::IntoCow;

@@ -1,0 +1,48 @@
+[package]
+name = "std_group"
+version = "1.0.0"
+authors = ["The Rust Project Developers"]
+
+[lib]
+name = "std_group"
+path = "src/libstd/deps/dummy.rs"
+
+[[bin]]
+name = "rustc"
+path = "src/driver/driver.rs"
+
+[[bin]]
+name = "rustdoc"
+path = "src/driver/driver.rs"
+
+[[bin]]
+name = "compiletest"
+path = "src/compiletest/compiletest.rs"
+
+[[bin]]
+name = "error-index-generator"
+path = "src/error-index-generator/main.rs"
+
+[dependencies]
+std = { path = "src/libstd", optional = true }
+alloc = { path = "src/liballoc", optional = true }
+alloc_system = { path = "src/liballoc_system", optional = true }
+alloc_jemalloc = { path = "src/liballoc_jemalloc", optional = true }
+compiler-rt = { path = "src/libstd/deps/compiler-rt", optional = true }
+
+arena = { path = "src/libarena", optional = true }
+collectionstest = { path = "src/libcollectionstest", optional = true }
+coretest = { path = "src/libcoretest", optional = true }
+fmt_macros = { path = "src/libfmt_macros", optional = true }
+flate = { path = "src/libflate", optional = true }
+getopts = { path = "src/libgetopts", optional = true }
+graphviz = { path = "src/libgraphviz", optional = true }
+log = { path = "src/liblog", optional = true }
+rbml = { path = "src/librbml", optional = true }
+serialize = { path = "src/libserialize", optional = true }
+term = { path = "src/libterm", optional = true }
+syntax = { path = "src/libsyntax", optional = true }
+test = { path = "src/libtest", optional = true }
+
+rustc_driver = { path = "src/librustc_driver", optional = true }
+rustdoc = { path = "src/librustdoc", optional = true }

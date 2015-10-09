@@ -23,7 +23,7 @@ fn f() {
           Spaced10
         */
         /*
-								  Tabbed8+2
+                                  Tabbed8+2
         */
         /*
   CR8+2

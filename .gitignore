@@ -54,6 +54,7 @@
 .valgrindrc
 /*-*-*-*/
 /*-*-*/
+/Cargo.toml
 /Makefile
 /build
 /dist/
@@ -77,6 +78,7 @@
 /stage3/
 /test/
 /tmp/
+Cargo.lock
 TAGS
 TAGS.emacs
 TAGS.vi
@@ -89,6 +91,7 @@ lexer.ml
 src/.DS_Store
 src/etc/dl
 src/librustc_llvm/llvmdeps.rs
+target/
 tmp.*.rs
 version.md
 version.ml
