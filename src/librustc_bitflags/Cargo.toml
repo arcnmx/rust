@@ -7,5 +7,5 @@ authors = ["The Rust Project Developers"]
 name = "rustc_bitflags"
 path = "lib.rs"
 
-[dependencies.core]
-path = "../libcore"
+[dependencies]
+core = { path = "../libcore" }

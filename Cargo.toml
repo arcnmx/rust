@@ -25,8 +25,9 @@ rbml = { path = "src/librbml", optional = true }
 serialize = { path = "src/libserialize", optional = true }
 term = { path = "src/libterm", optional = true }
 syntax = { path = "src/libsyntax", optional = true }
+test = { path = "src/libtest", optional = true }
 
 [features]
 libstd = [ "system", "std", "system/rust_builtin", "system/compiler-rt", "system/backtrace", "alloc_system", "alloc_jemalloc" ]
 libstd_light = [ "system", "std", "system/disable-backtrace", "alloc_system" ]
-deps = [ "arena", "collectionstest", "coretest", "fmt_macros", "flate", "getopts", "graphviz", "log", "rbml", "serialize", "syntax", "term" ]
+deps = [ "arena", "collectionstest", "coretest", "fmt_macros", "flate", "getopts", "graphviz", "log", "rbml", "serialize", "syntax", "term", "test" ]

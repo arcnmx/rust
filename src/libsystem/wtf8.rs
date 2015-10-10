@@ -775,8 +775,7 @@ impl Hash for Wtf8 {
 
 #[cfg(test)]
 mod tests {
-    use prelude::v1::*;
-    use borrow::Cow;
+    use collections::borrow::Cow;
     use super::*;
 
     #[test]

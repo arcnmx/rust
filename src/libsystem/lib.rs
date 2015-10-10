@@ -38,7 +38,7 @@
 #![unstable(feature = "system", issue = "0")]
 
 #[macro_use]
-extern crate collections as collections;
+extern crate collections;
 
 #[macro_use]
 extern crate rustc_bitflags;
@@ -51,10 +51,18 @@ extern crate alloc;
 extern crate libc;
 
 #[macro_use]
-mod common;
+pub mod inner;
+pub mod io;
+mod wtf8;
+mod c_str;
+mod deps;
 
-#[cfg(unix)]
-pub mod unix;
+#[macro_use]
+mod common;
+#[cfg(unix)] pub mod unix;
+pub mod bind;
+pub mod none;
+
 
 pub mod thread_local;
 pub mod unwind;
@@ -76,15 +84,7 @@ pub mod process;
 pub mod rt;
 pub mod c;
 
-pub mod inner;
-pub mod io;
-mod wtf8;
-mod c_str;
-mod deps;
-
 pub mod os;
-#[cfg(not(any(unix, windows)))]
-pub mod bind;
 
 #[cfg(not(any(unix, windows)))]
 #[path = ""] pub mod imp {
@@ -114,8 +114,6 @@ pub mod bind;
 
 #[cfg(unix)]
 #[path = ""] pub mod imp {
-    pub use unix::ext;
-
     pub use common::{
         thread_local,
         c,
@@ -125,7 +123,6 @@ pub mod bind;
 
     pub use unix::{
         error,
-        backtrace,
         env,
         stdio,
         path,
@@ -138,6 +135,9 @@ pub mod bind;
         process,
         rt
     };
+
+    #[cfg(feature = "backtrace")] pub use unix::backtrace;
+    #[cfg(not(feature = "backtrace"))] pub use none::backtrace;
 
     pub mod sync {
         pub use unix::sync::Sync;

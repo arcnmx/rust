@@ -234,7 +234,7 @@ impl fmt::Debug for TcpStream {
         }
 
         let name = if cfg!(windows) {"socket"} else {"fd"};
-        res.field(name, &self.0.as_inner())
+        res.field(name, AsInner::<sys::Socket>::as_inner(&self.0))
             .finish()
     }
 }
@@ -324,7 +324,7 @@ impl fmt::Debug for TcpListener {
         }
 
         let name = if cfg!(windows) {"socket"} else {"fd"};
-        res.field(name, &self.0.as_inner())
+        res.field(name, AsInner::<sys::Socket>::as_inner(&self.0))
             .finish()
     }
 }
@@ -335,11 +335,11 @@ mod tests {
 
     use io::ErrorKind;
     use io::prelude::*;
+    use sys::inner::prelude::*;
     use net::*;
     use net::test::{next_test_ip4, next_test_ip6};
     use sync::mpsc::channel;
-    use sys_common::AsInner;
-    use time::Duration;
+    use time::{self, Duration};
     use thread;
 
     fn each_ip(f: &mut FnMut(SocketAddr)) {
@@ -913,18 +913,20 @@ mod tests {
 
     #[test]
     fn debug() {
+        use sys::net::prelude as sys;
+
         let name = if cfg!(windows) {"socket"} else {"fd"};
         let socket_addr = next_test_ip4();
 
         let listener = t!(TcpListener::bind(&socket_addr));
-        let listener_inner = listener.0.socket().as_inner();
+        let listener_inner = AsInner::<sys::Socket>::as_inner(&listener.0);
         let compare = format!("TcpListener {{ addr: {:?}, {}: {:?} }}",
                               socket_addr, name, listener_inner);
         assert_eq!(format!("{:?}", listener), compare);
 
         let stream = t!(TcpStream::connect(&("localhost",
                                                  socket_addr.port())));
-        let stream_inner = stream.0.socket().as_inner();
+        let stream_inner = AsInner::<sys::Socket>::as_inner(&stream.0);
         let compare = format!("TcpStream {{ addr: {:?}, \
                               peer: {:?}, {}: {:?} }}",
                               stream.local_addr().unwrap(),
@@ -971,7 +973,7 @@ mod tests {
         t!(stream.set_read_timeout(Some(Duration::from_millis(1000))));
 
         let mut buf = [0; 10];
-        let wait = Duration::span(|| {
+        let wait = time::span(|| {
             let kind = stream.read(&mut buf).err().expect("expected error").kind();
             assert!(kind == ErrorKind::WouldBlock || kind == ErrorKind::TimedOut);
         });
@@ -993,7 +995,7 @@ mod tests {
         t!(stream.read(&mut buf));
         assert_eq!(b"hello world", &buf[..]);
 
-        let wait = Duration::span(|| {
+        let wait = time::span(|| {
             let kind = stream.read(&mut buf).err().expect("expected error").kind();
             assert!(kind == ErrorKind::WouldBlock || kind == ErrorKind::TimedOut);
         });

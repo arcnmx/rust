@@ -12,8 +12,8 @@ use error::prelude::*;
 use inner::prelude::*;
 use os_str::prelude::*;
 use io::prelude::*;
-
 use fs as sys;
+
 use c_str::{CString, CStr, NulError};
 use core::fmt;
 use libc::{self, c_int, size_t, off_t, c_char, mode_t};
@@ -29,10 +29,11 @@ use collections::Vec;
 use collections::borrow::ToOwned;
 
 pub struct File(FileDesc);
+impl_inner!(File(FileDesc));
+impl_inner!(File(FileDesc(c_int)));
 
-pub struct FileAttr {
-    stat: raw::stat,
-}
+pub struct FileAttr(raw::stat);
+impl_inner!(FileAttr(raw::stat));
 
 pub struct ReadDir {
     dirp: Dir,
@@ -58,52 +59,51 @@ pub struct OpenOptions {
 }
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct FilePermissions { mode: mode_t }
+pub struct FilePermissions(mode_t);
+impl_inner!(FilePermissions(raw::mode_t));
 
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
-pub struct FileType { mode: mode_t }
+pub struct FileType(mode_t);
+impl_inner!(FileType(mode_t));
 
 pub struct DirBuilder { mode: mode_t }
 
 impl sys::FileAttr<Fs> for FileAttr {
-    fn size(&self) -> u64 { self.stat.st_size as u64 }
+    fn size(&self) -> u64 { self.0.st_size as u64 }
     fn perm(&self) -> FilePermissions {
-        FilePermissions { mode: (self.stat.st_mode as mode_t) & 0o777 }
+        FilePermissions((self.0.st_mode as mode_t) & 0o777)
     }
 
     fn file_type(&self) -> FileType {
-        FileType { mode: self.stat.st_mode as mode_t }
+        FileType(self.0.st_mode as mode_t)
     }
-}
-
-impl AsInner<raw::stat> for FileAttr {
-    fn as_inner(&self) -> &raw::stat { &self.stat }
 }
 
 impl sys::FilePermissions<Fs> for FilePermissions {
-    fn readonly(&self) -> bool { self.mode & 0o222 == 0 }
+    fn readonly(&self) -> bool { self.0 & 0o222 == 0 }
     fn set_readonly(&mut self, readonly: bool) {
         if readonly {
-            self.mode &= !0o222;
+            self.0 &= !0o222;
         } else {
-            self.mode |= 0o222;
+            self.0 |= 0o222;
         }
     }
-    fn mode(&self) -> raw::mode_t { self.mode }
+    fn mode(&self) -> raw::mode_t { self.0 }
 }
 
-impl sys::FileType<Fs> for FileType {
+impl sys::FileType for FileType {
     fn is_dir(&self) -> bool { self.is(libc::S_IFDIR) }
     fn is_file(&self) -> bool { self.is(libc::S_IFREG) }
     fn is_symlink(&self) -> bool { self.is(libc::S_IFLNK) }
-
-    fn is(&self, mode: mode_t) -> bool { self.mode & libc::S_IFMT == mode }
 }
 
-impl FromInner<raw::mode_t> for FilePermissions {
-    fn from_inner(mode: raw::mode_t) -> FilePermissions {
-        FilePermissions { mode: mode as mode_t }
-    }
+impl FileType {
+    fn is(&self, mode: mode_t) -> bool { self.0 & libc::S_IFMT == mode }
+
+    pub fn is_block_device(&self) -> bool { self.is(libc::S_IFBLK) }
+    pub fn is_char_device(&self) -> bool { self.is(libc::S_IFCHR) }
+    pub fn is_fifo(&self) -> bool { self.is(libc::S_IFIFO) }
+    pub fn is_socket(&self) -> bool { self.is(libc::S_IFSOCK) }
 }
 
 impl sys::ReadDir<Fs> for ReadDir { }
@@ -170,7 +170,7 @@ impl sys::DirEntry<Fs> for DirEntry {
         unsafe {
             match rust_dir_get_mode(self.dirent()) {
                 -1 => lstat(&self.path()).map(|m| sys::FileAttr::file_type(&m)),
-                n => Ok(FileType { mode: n as mode_t }),
+                n => Ok(FileType(n as mode_t)),
             }
         }
     }
@@ -278,7 +278,7 @@ impl sys::File<Fs> for File {
         if unsafe { libc::fstat(*self.0.as_inner(), &mut stat as *mut _ as *mut _) } < 0 {
             Error::expect_last_result()
         } else {
-            Ok(FileAttr { stat: stat })
+            Ok(FileAttr(stat))
         }
     }
 
@@ -337,18 +337,6 @@ impl Seek for File {
     }
 }
 
-impl AsInner<FileDesc> for File {
-    fn as_inner(&self) -> &FileDesc { &self.0 }
-}
-
-impl IntoInner<FileDesc> for File {
-    fn into_inner(self) -> FileDesc { self.0 }
-}
-
-impl FromInner<FileDesc> for File {
-    fn from_inner(fd: FileDesc) -> Self { File(fd) }
-}
-
 impl sys::DirBuilder<Fs> for DirBuilder {
     fn new() -> DirBuilder {
         DirBuilder { mode: 0o777 }
@@ -370,12 +358,6 @@ impl sys::DirBuilder<Fs> for DirBuilder {
 
 fn cstr(path: &OsStr) -> result::Result<CString, NulError> {
     CString::new(path.as_bytes())
-}
-
-impl FromInner<c_int> for File {
-    fn from_inner(fd: c_int) -> File {
-        File(FileDesc::from_inner(fd))
-    }
 }
 
 impl fmt::Debug for File {
@@ -478,7 +460,7 @@ fn rename(old: &OsStr, new: &OsStr) -> Result<()> {
 
 fn set_perm(p: &OsStr, perm: FilePermissions) -> Result<()> {
     let p = try!(cstr(p));
-    cvt_r(|| unsafe { libc::chmod(p.as_ptr(), perm.mode) }).map(drop)
+    cvt_r(|| unsafe { libc::chmod(p.as_ptr(), *perm.as_inner()) }).map(drop)
 }
 
 fn rmdir(p: &OsStr) -> Result<()> {
@@ -543,7 +525,7 @@ fn stat(p: &OsStr) -> Result<FileAttr> {
     if unsafe { libc::stat(p.as_ptr(), &mut stat as *mut _ as *mut _) } < 0 {
         Error::expect_last_result()
     } else {
-        Ok(FileAttr { stat: stat })
+        Ok(FileAttr(stat))
     }
 }
 
@@ -553,7 +535,7 @@ fn lstat(p: &OsStr) -> Result<FileAttr> {
     if unsafe { libc::lstat(p.as_ptr(), &mut stat as *mut _ as *mut _) } < 0 {
         Error::expect_last_result()
     } else {
-        Ok(FileAttr { stat: stat })
+        Ok(FileAttr(stat))
     }
 }
 

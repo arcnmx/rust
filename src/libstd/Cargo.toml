@@ -18,3 +18,9 @@ rustc_bitflags = { path = "../librustc_bitflags" }
 
 [dev-dependencies]
 test = { path = "../libtest" }
+
+[features]
+default = ["compiler-rt", "backtrace", "rust_builtin"]
+compiler-rt = ["system/compiler-rt"]
+backtrace = ["system/backtrace"]
+rust_builtin = ["system/rust_builtin"]

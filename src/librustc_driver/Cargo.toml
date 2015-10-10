@@ -13,11 +13,6 @@ name = "rustc"
 path = "../driver/driver.rs"
 
 [dependencies]
-arena = { path = "../libarena" }
-flate = { path = "../libflate" }
-getopts = { path = "../libgetopts" }
-graphviz = { path = "../libgraphviz" }
-libc = { path = "../liblibc" }
 rustc = { path = "../librustc" }
 rustc_back = { path = "../librustc_back" }
 rustc_borrowck = { path = "../librustc_borrowck" }
@@ -29,6 +24,3 @@ rustc_resolve = { path = "../librustc_resolve" }
 rustc_trans = { path = "../librustc_trans" }
 rustc_typeck = { path = "../librustc_typeck" }
 rustc_llvm = { path = "../librustc_llvm" }
-log = { path = "../liblog" }
-syntax = { path = "../libsyntax" }
-serialize = { path = "../libserialize" }

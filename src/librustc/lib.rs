@@ -32,7 +32,7 @@
 #![feature(collections)]
 #![feature(const_fn)]
 #![feature(core)]
-#![feature(duration_span)]
+#![feature(time_span)]
 #![feature(dynamic_lib)]
 #![feature(enumset)]
 #![feature(fs_canonicalize)]

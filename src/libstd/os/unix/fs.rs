@@ -11,12 +11,16 @@
 //! Unix-specific extensions to primitives in the `std::fs` module.
 
 #![stable(feature = "rust1", since = "1.0.0")]
+#![allow(missing_docs)]
 
-use fs::prelude as fs;
-use libc;
+use sys::inner::prelude::*;
+use sys::fs::prelude::*;
+use fs;
 use io;
 use os::raw::c_long;
 use os::unix::raw;
+use path::Path;
+use sys;
 
 #[unstable(feature = "fs_mode", reason = "recently added API", issue = "27712")]
 pub const USER_READ: raw::mode_t = 0o400;
@@ -76,14 +80,14 @@ pub trait PermissionsExt {
 }
 
 #[stable(feature = "fs_ext", since = "1.1.0")]
-impl PermissionsExt for Permissions {
+impl PermissionsExt for fs::Permissions {
     fn mode(&self) -> raw::mode_t { self.as_inner().mode() }
 
     fn set_mode(&mut self, mode: raw::mode_t) {
         *self = FromInner::from_inner(FromInner::from_inner(mode));
     }
 
-    fn from_mode(mode: raw::mode_t) -> Permissions {
+    fn from_mode(mode: raw::mode_t) -> fs::Permissions {
         FromInner::from_inner(FromInner::from_inner(mode))
     }
 }
@@ -100,8 +104,8 @@ pub trait OpenOptionsExt {
 }
 
 #[stable(feature = "fs_ext", since = "1.1.0")]
-impl OpenOptionsExt for OpenOptions {
-    fn mode(&mut self, mode: raw::mode_t) -> &mut OpenOptions {
+impl OpenOptionsExt for fs::OpenOptions {
+    fn mode(&mut self, mode: raw::mode_t) -> &mut fs::OpenOptions {
         self.as_inner_mut().mode(mode); self
     }
 }
@@ -150,26 +154,26 @@ pub trait MetadataExt {
 }
 
 impl MetadataExt for fs::Metadata {
-    fn dev(&self) -> raw::dev_t { self.as_raw_stat().st_dev as raw::dev_t }
-    fn ino(&self) -> raw::ino_t { self.as_raw_stat().st_ino as raw::ino_t }
-    fn mode(&self) -> raw::mode_t { self.as_raw_stat().st_mode as raw::mode_t }
-    fn nlink(&self) -> raw::nlink_t { self.as_raw_stat().st_nlink as raw::nlink_t }
-    fn uid(&self) -> raw::uid_t { self.as_raw_stat().st_uid as raw::uid_t }
-    fn gid(&self) -> raw::gid_t { self.as_raw_stat().st_gid as raw::gid_t }
-    fn rdev(&self) -> raw::dev_t { self.as_raw_stat().st_rdev as raw::dev_t }
-    fn size(&self) -> raw::off_t { self.as_raw_stat().st_size as raw::off_t }
-    fn atime(&self) -> raw::time_t { self.as_raw_stat().st_atime }
-    fn atime_nsec(&self) -> c_long { self.as_raw_stat().st_atime_nsec as c_long }
-    fn mtime(&self) -> raw::time_t { self.as_raw_stat().st_mtime }
-    fn mtime_nsec(&self) -> c_long { self.as_raw_stat().st_mtime_nsec as c_long }
-    fn ctime(&self) -> raw::time_t { self.as_raw_stat().st_ctime }
-    fn ctime_nsec(&self) -> c_long { self.as_raw_stat().st_ctime_nsec as c_long }
+    fn dev(&self) -> raw::dev_t { self.as_inner().as_inner().st_dev as raw::dev_t }
+    fn ino(&self) -> raw::ino_t { self.as_inner().as_inner().st_ino as raw::ino_t }
+    fn mode(&self) -> raw::mode_t { self.as_inner().as_inner().st_mode as raw::mode_t }
+    fn nlink(&self) -> raw::nlink_t { self.as_inner().as_inner().st_nlink as raw::nlink_t }
+    fn uid(&self) -> raw::uid_t { self.as_inner().as_inner().st_uid as raw::uid_t }
+    fn gid(&self) -> raw::gid_t { self.as_inner().as_inner().st_gid as raw::gid_t }
+    fn rdev(&self) -> raw::dev_t { self.as_inner().as_inner().st_rdev as raw::dev_t }
+    fn size(&self) -> raw::off_t { self.as_inner().as_inner().st_size as raw::off_t }
+    fn atime(&self) -> raw::time_t { self.as_inner().as_inner().st_atime }
+    fn atime_nsec(&self) -> c_long { self.as_inner().as_inner().st_atime_nsec as c_long }
+    fn mtime(&self) -> raw::time_t { self.as_inner().as_inner().st_mtime }
+    fn mtime_nsec(&self) -> c_long { self.as_inner().as_inner().st_mtime_nsec as c_long }
+    fn ctime(&self) -> raw::time_t { self.as_inner().as_inner().st_ctime }
+    fn ctime_nsec(&self) -> c_long { self.as_inner().as_inner().st_ctime_nsec as c_long }
 
     fn blksize(&self) -> raw::blksize_t {
-        self.as_raw_stat().st_blksize as raw::blksize_t
+        self.as_inner().as_inner().st_blksize as raw::blksize_t
     }
     fn blocks(&self) -> raw::blkcnt_t {
-        self.as_raw_stat().st_blocks as raw::blkcnt_t
+        self.as_inner().as_inner().st_blocks as raw::blkcnt_t
     }
 }
 
@@ -190,10 +194,10 @@ pub trait FileTypeExt {
 #[unstable(feature = "file_type_ext", reason = "recently added API",
            issue = "27796")]
 impl FileTypeExt for fs::FileType {
-    fn is_block_device(&self) -> bool { self.as_inner().is(libc::S_IFBLK) }
-    fn is_char_device(&self) -> bool { self.as_inner().is(libc::S_IFCHR) }
-    fn is_fifo(&self) -> bool { self.as_inner().is(libc::S_IFIFO) }
-    fn is_socket(&self) -> bool { self.as_inner().is(libc::S_IFSOCK) }
+    fn is_block_device(&self) -> bool { self.as_inner().is_block_device() }
+    fn is_char_device(&self) -> bool { self.as_inner().is_char_device() }
+    fn is_fifo(&self) -> bool { self.as_inner().is_fifo() }
+    fn is_socket(&self) -> bool { self.as_inner().is_socket() }
 }
 
 /// Unix-specific extension methods for `fs::DirEntry`
@@ -207,6 +211,35 @@ pub trait DirEntryExt {
 
 impl DirEntryExt for fs::DirEntry {
     fn ino(&self) -> raw::ino_t { self.as_inner().ino() }
+}
+
+/// Creates a new symbolic link on the filesystem.
+///
+/// The `dst` path will be a symbolic link pointing to the `src` path.
+///
+/// # Note
+///
+/// On Windows, you must specify whether a symbolic link points to a file
+/// or directory.  Use `os::windows::fs::symlink_file` to create a
+/// symbolic link to a file, or `os::windows::fs::symlink_dir` to create a
+/// symbolic link to a directory.  Additionally, the process must have
+/// `SeCreateSymbolicLinkPrivilege` in order to be able to create a
+/// symbolic link.
+///
+/// # Examples
+///
+/// ```
+/// use std::os::unix::fs;
+///
+/// # fn foo() -> std::io::Result<()> {
+/// try!(fs::symlink("a.txt", "b.txt"));
+/// # Ok(())
+/// # }
+/// ```
+#[stable(feature = "symlink", since = "1.1.0")]
+pub fn symlink<P: AsRef<Path>, Q: AsRef<Path>>(src: P, dst: Q) -> io::Result<()>
+{
+    Fs::symlink(src.as_ref().as_os_str().as_inner(), dst.as_ref().as_os_str().as_inner()).map_err(From::from)
 }
 
 #[unstable(feature = "dir_builder", reason = "recently added API",

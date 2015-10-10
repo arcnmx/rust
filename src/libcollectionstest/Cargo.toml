@@ -9,6 +9,4 @@ path = "lib.rs"
 
 [dependencies]
 log = { path = "../liblog" }
-collections = { path = "../libcollections" }
 test = { path = "../libtest" }
-rustc_unicode = { path = "../librustc_unicode" }

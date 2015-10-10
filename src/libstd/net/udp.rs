@@ -164,7 +164,7 @@ impl fmt::Debug for UdpSocket {
         }
 
         let name = if cfg!(windows) {"socket"} else {"fd"};
-        res.field(name, &self.0.as_inner())
+        res.field(name, AsInner::<sys::Socket>::as_inner(&self.0))
             .finish()
     }
 }
@@ -174,12 +174,12 @@ impl fmt::Debug for UdpSocket {
 mod tests {
     use prelude::v1::*;
 
+    use sys::inner::prelude::*;
     use io::ErrorKind;
     use net::*;
     use net::test::{next_test_ip4, next_test_ip6};
     use sync::mpsc::channel;
-    use sys_common::AsInner;
-    use time::Duration;
+    use time::{self, Duration};
     use thread;
 
     fn each_ip(f: &mut FnMut(SocketAddr, SocketAddr)) {
@@ -339,11 +339,13 @@ mod tests {
 
     #[test]
     fn debug() {
+        use sys::net::prelude as sys;
+
         let name = if cfg!(windows) {"socket"} else {"fd"};
         let socket_addr = next_test_ip4();
 
         let udpsock = t!(UdpSocket::bind(&socket_addr));
-        let udpsock_inner = udpsock.0.socket().as_inner();
+        let udpsock_inner = AsInner::<sys::Socket>::as_inner(&udpsock.0);
         let compare = format!("UdpSocket {{ addr: {:?}, {}: {:?} }}",
                               socket_addr, name, udpsock_inner);
         assert_eq!(format!("{:?}", udpsock), compare);
@@ -384,7 +386,7 @@ mod tests {
         t!(stream.set_read_timeout(Some(Duration::from_millis(1000))));
 
         let mut buf = [0; 10];
-        let wait = Duration::span(|| {
+        let wait = time::span(|| {
             let kind = stream.recv_from(&mut buf).err().expect("expected error").kind();
             assert!(kind == ErrorKind::WouldBlock || kind == ErrorKind::TimedOut);
         });
@@ -404,7 +406,7 @@ mod tests {
         t!(stream.recv_from(&mut buf));
         assert_eq!(b"hello world", &buf[..]);
 
-        let wait = Duration::span(|| {
+        let wait = time::span(|| {
             let kind = stream.recv_from(&mut buf).err().expect("expected error").kind();
             assert!(kind == ErrorKind::WouldBlock || kind == ErrorKind::TimedOut);
         });

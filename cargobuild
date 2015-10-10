@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -eu
 
 if [ $# -lt 1 ]; then
@@ -28,11 +28,26 @@ export CFG_COMPILER_HOST_TRIPLE="$HOST"
 export CFG_LLVM_CONFIG="$LLVM_CONFIG"
 export CFG_LLVM_STDCPP="stdc++"
 
-cargo build --manifest-path "$ROOT/src/libstd/Cargo.toml" --target $TARGET --no-default-features "$@"
+export CARGO_TARGET_DIR="$ROOT/target/std"
 cargo build --manifest-path "$ROOT/Cargo.toml" --target $TARGET --features libstd "$@"
-cargo build --manifest-path "$ROOT/Cargo.toml" --target $TARGET --features libstd_light "$@"
-exit
-cargo build --manifest-path "$ROOT/Cargo.toml" --target $TARGET --features libstd "$@"
+#cargo build --manifest-path "$ROOT/Cargo.toml" --target $TARGET --features libstd_light "$@"
+
+SYSROOT="$CARGO_TARGET_DIR/lib/rustlib/$TARGET"
+mkdir -p "$SYSROOT/lib"
+ln -sf "$CARGO_TARGET_DIR/$TARGET/debug/deps/lib"{alloc,backtrace,collections,compiler_rt,core,libc,rand,rust_builtin,rustc_bitflags,rustc_unicode,system,std}*.rlib "$SYSROOT/lib/"
+ln -sf "$CARGO_TARGET_DIR/$TARGET/debug/deps/libcompiler_rt.a" "$SYSROOT/lib/"
+
+export CARGO_TARGET_DIR="$ROOT/target/non-std"
+export RUSTC_SYSROOT="$SYSROOT/../../../"
+cargo build --manifest-path "$ROOT/Cargo.toml" --target $TARGET --features deps "$@"
+ln -sf "$CARGO_TARGET_DIR/$TARGET/debug/deps/lib"{arena,collectionstest,coretest,fmt_macros,flate,getopts,graphviz,log,rbml,serialize,syntax,term,test}*.rlib "$SYSROOT/lib/"
+
+export CARGO_TARGET_DIR="$ROOT/target/staging"
+export CFG_LLVM_LINKAGE_FILE="$CARGO_TARGET_DIR/$TARGET/llvmdeps.rs"
+#cargo test --manifest-path "$ROOT/src/libsystem/Cargo.toml" --target $TARGET --no-default-features --features "compiler-rt backtrace rust_builtin" "$@"
+#cargo test --manifest-path "$ROOT/src/libstd/Cargo.toml" --target $TARGET --no-default-features --features "compiler-rt backtrace rust_builtin" "$@"
+#exit
+#cargo build --manifest-path "$ROOT/Cargo.toml" --target $TARGET --features libstd "$@"
 cargo build --manifest-path "$ROOT/src/librustc_driver/Cargo.toml" --target $TARGET --bin rustc "$@"
 cargo build --manifest-path "$ROOT/src/librustdoc/Cargo.toml" --target $TARGET --bin rustdoc "$@"
 cargo build --manifest-path "$ROOT/src/compiletest/Cargo.toml" --target $TARGET "$@"

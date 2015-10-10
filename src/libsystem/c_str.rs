@@ -8,7 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-use c::prelude::*;
+use c::prelude::strlen;
+use os::raw::c_char;
 use alloc::boxed::Box;
 use collections::borrow::{Borrow, Cow, ToOwned};
 use collections::{String, Vec};

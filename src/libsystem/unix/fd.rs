@@ -15,14 +15,12 @@ use libc::{self, c_int, size_t, c_void};
 use core::mem;
 use unix::c;
 
-pub struct FileDesc {
-    fd: c_int,
-}
+pub struct FileDesc(c_int);
 
 impl FileDesc {
     pub fn set_cloexec(&self) {
         unsafe {
-            let ret = c::ioctl(self.fd, c::FIOCLEX);
+            let ret = c::ioctl(self.0, c::FIOCLEX);
             debug_assert_eq!(ret, 0);
         }
     }
@@ -31,7 +29,7 @@ impl FileDesc {
 impl io::Read for FileDesc {
     fn read(&self, buf: &mut [u8]) -> Result<usize> {
         unsafe {
-            match libc::read(self.fd, buf.as_mut_ptr() as *mut c_void, buf.len() as size_t) {
+            match libc::read(self.0, buf.as_mut_ptr() as *mut c_void, buf.len() as size_t) {
                 -1 => Error::expect_last_result(),
                 len => Ok(len as usize),
             }
@@ -42,7 +40,7 @@ impl io::Read for FileDesc {
 impl io::Write for FileDesc {
     fn write(&self, buf: &[u8]) -> Result<usize> {
         unsafe {
-            match libc::write(self.fd, buf.as_ptr() as *const c_void, buf.len() as size_t) {
+            match libc::write(self.0, buf.as_ptr() as *const c_void, buf.len() as size_t) {
                 -1 => Error::expect_last_result(),
                 len => Ok(len as usize),
             }
@@ -50,24 +48,7 @@ impl io::Write for FileDesc {
     }
 }
 
-impl AsInner<c_int> for FileDesc {
-    fn as_inner(&self) -> &c_int { &self.fd }
-}
-
-impl IntoInner<c_int> for FileDesc {
-    /// Extracts the actual filedescriptor without closing it.
-    fn into_inner(self) -> c_int {
-        let fd = self.fd;
-        mem::forget(self);
-        fd
-    }
-}
-
-impl FromInner<c_int> for FileDesc {
-    fn from_inner(fd: c_int) -> Self {
-        FileDesc { fd: fd }
-    }
-}
+impl_inner!(FileDesc(c_int): AsInner + IntoInnerForget + FromInner);
 
 impl Drop for FileDesc {
     fn drop(&mut self) {
@@ -76,6 +57,6 @@ impl Drop for FileDesc {
         // the file descriptor was closed or not, and if we retried (for
         // something like EINTR), we might close another valid file descriptor
         // (opened after we closed ours.
-        let _ = unsafe { libc::close(self.fd) };
+        let _ = unsafe { libc::close(self.0) };
     }
 }

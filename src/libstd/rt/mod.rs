@@ -8,6 +8,8 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
+#![doc(hidden)]
+
 //! Runtime services
 //!
 //! The `rt` module provides a narrow set of runtime services,
@@ -21,7 +23,7 @@ mod backtrace;
 mod at_exit;
 
 pub use self::at_exit::at_exit;
-pub use self::panicking::LOCAL_STDERR;
+pub use self::panicking::{LOCAL_STDERR, rust_std_on_panic};
 
 pub fn cleanup() {
     at_exit::cleanup();

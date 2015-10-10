@@ -23,7 +23,7 @@ use sys::process::prelude as sys;
 
 use ffi::OsStr;
 use fmt;
-use rt;
+use util;
 use io::{self, Error, ErrorKind};
 use path;
 use sync::mpsc::{channel, Receiver};
@@ -531,7 +531,7 @@ impl Child {
 #[stable(feature = "rust1", since = "1.0.0")]
 pub fn exit(code: i32) -> ! {
     unsafe {
-        rt::cleanup();
+        util::cleanup();
         Runtime::cleanup();
     }
     sys::Process::exit(code)
@@ -539,6 +539,8 @@ pub fn exit(code: i32) -> ! {
 
 #[cfg(test)]
 mod tests {
+    extern crate libc;
+
     use prelude::v1::*;
     use io::prelude::*;
 
@@ -643,7 +645,7 @@ mod tests {
     #[test]
     fn uid_works() {
         use os::unix::prelude::*;
-        use libc;
+        use self::libc;
         let mut p = Command::new("/bin/sh")
                             .arg("-c").arg("true")
                             .uid(unsafe { libc::getuid() })
@@ -656,7 +658,7 @@ mod tests {
     #[test]
     fn uid_to_root_fails() {
         use os::unix::prelude::*;
-        use libc;
+        use self::libc;
 
         // if we're already root, this isn't a valid test. Most of the bots run
         // as non-root though (android is an exception).

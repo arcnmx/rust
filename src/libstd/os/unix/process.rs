@@ -12,10 +12,11 @@
 
 #![stable(feature = "rust1", since = "1.0.0")]
 
-use inner::prelude::*;
+use sys::inner::prelude::*;
+use sys::process::prelude as sys;
 use os::unix::raw::{uid_t, gid_t};
 use os::unix::io::{FromRawFd, RawFd, AsRawFd, IntoRawFd};
-use process::prelude as sys;
+use process;
 
 /// Unix-specific extensions to the `std::process::Command` builder
 #[stable(feature = "rust1", since = "1.0.0")]
@@ -46,18 +47,18 @@ pub trait CommandExt {
 }
 
 #[stable(feature = "rust1", since = "1.0.0")]
-impl CommandExt for sys::Command {
-    fn uid(&mut self, id: uid_t) -> &mut sys::Command {
+impl CommandExt for process::Command {
+    fn uid(&mut self, id: uid_t) -> &mut process::Command {
         self.as_inner_mut().uid = Some(id);
         self
     }
 
-    fn gid(&mut self, id: gid_t) -> &mut sys::Command {
+    fn gid(&mut self, id: gid_t) -> &mut process::Command {
         self.as_inner_mut().gid = Some(id);
         self
     }
 
-    fn session_leader(&mut self, on: bool) -> &mut sys::Command {
+    fn session_leader(&mut self, on: bool) -> &mut process::Command {
         self.as_inner_mut().session_leader = on;
         self
     }
@@ -72,7 +73,7 @@ pub trait ExitStatusExt {
 }
 
 #[stable(feature = "rust1", since = "1.0.0")]
-impl ExitStatusExt for sys::ExitStatus {
+impl ExitStatusExt for process::ExitStatus {
     fn signal(&self) -> Option<i32> {
         match *self.as_inner() {
             sys::ExitStatus::Signal(s) => Some(s),
@@ -82,8 +83,47 @@ impl ExitStatusExt for sys::ExitStatus {
 }
 
 #[stable(feature = "process_extensions", since = "1.2.0")]
-impl FromRawFd for sys::Stdio {
-    unsafe fn from_raw_fd(fd: RawFd) -> sys::Stdio {
-        sys::Stdio::from_inner(sys::fd::FileDesc::new(fd))
+impl FromRawFd for process::Stdio {
+    unsafe fn from_raw_fd(fd: RawFd) -> process::Stdio {
+        process::Stdio::from_inner(fd)
+    }
+}
+
+#[stable(feature = "process_extensions", since = "1.2.0")]
+impl AsRawFd for process::ChildStdin {
+    fn as_raw_fd(&self) -> RawFd {
+        *self.as_inner().as_inner()
+    }
+}
+
+#[stable(feature = "process_extensions", since = "1.2.0")]
+impl AsRawFd for process::ChildStdout {
+    fn as_raw_fd(&self) -> RawFd {
+        *self.as_inner().as_inner()
+    }
+}
+
+#[stable(feature = "process_extensions", since = "1.2.0")]
+impl AsRawFd for process::ChildStderr {
+    fn as_raw_fd(&self) -> RawFd {
+        *self.as_inner().as_inner()
+    }
+}
+
+impl IntoRawFd for process::ChildStdin {
+    fn into_raw_fd(self) -> RawFd {
+        self.into_inner().into_inner()
+    }
+}
+
+impl IntoRawFd for process::ChildStdout {
+    fn into_raw_fd(self) -> RawFd {
+        self.into_inner().into_inner()
+    }
+}
+
+impl IntoRawFd for process::ChildStderr {
+    fn into_raw_fd(self) -> RawFd {
+        self.into_inner().into_inner()
     }
 }

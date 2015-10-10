@@ -8,9 +8,5 @@ build = "build.rs"
 name = "rustc_llvm"
 path = "lib.rs"
 
-[dependencies]
-libc = { path = "../liblibc" }
-rustc_bitflags = { path = "../librustc_bitflags" }
-
 [build-dependencies]
 gcc = "0.3"

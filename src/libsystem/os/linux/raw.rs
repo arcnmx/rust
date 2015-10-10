@@ -25,7 +25,7 @@ pub use self::arch::{off_t, ino_t, nlink_t, blksize_t, blkcnt_t, stat, time_t};
 mod arch {
     use super::{dev_t, mode_t};
     use os::raw::{c_long, c_short};
-    use os::unix::raw::{gid_t, uid_t};
+    use unix::raw::{gid_t, uid_t};
 
     #[stable(feature = "raw_ext", since = "1.1.0")] pub type blkcnt_t = i32;
     #[stable(feature = "raw_ext", since = "1.1.0")] pub type blksize_t = i32;
@@ -85,7 +85,7 @@ mod arch {
 mod arch {
     use super::mode_t;
     use os::raw::{c_long, c_ulong};
-    use os::unix::raw::{gid_t, uid_t};
+    use unix::raw::{gid_t, uid_t};
 
     #[stable(feature = "raw_ext", since = "1.1.0")] pub type blkcnt_t = i32;
     #[stable(feature = "raw_ext", since = "1.1.0")] pub type blksize_t = i32;
@@ -144,7 +144,7 @@ mod arch {
 mod arch {
     use super::{dev_t, mode_t};
     use os::raw::{c_long, c_int};
-    use os::unix::raw::{gid_t, uid_t};
+    use unix::raw::{gid_t, uid_t};
 
     #[stable(feature = "raw_ext", since = "1.1.0")] pub type blkcnt_t = i64;
     #[stable(feature = "raw_ext", since = "1.1.0")] pub type blksize_t = i32;
@@ -201,7 +201,7 @@ mod arch {
 mod arch {
     use super::{dev_t, mode_t};
     use os::raw::{c_long, c_int};
-    use os::unix::raw::{gid_t, uid_t};
+    use unix::raw::{gid_t, uid_t};
 
     #[stable(feature = "raw_ext", since = "1.1.0")] pub type blkcnt_t = i64;
     #[stable(feature = "raw_ext", since = "1.1.0")] pub type blksize_t = i64;

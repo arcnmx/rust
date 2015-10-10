@@ -516,7 +516,7 @@ impl<'a> Write for StderrLock<'a> {
            issue = "0")]
 #[doc(hidden)]
 pub fn set_panic(sink: Box<Write + Send>) -> Option<Box<Write + Send>> {
-    use rt::LOCAL_STDERR;
+    use util::LOCAL_STDERR;
     use mem;
 
     LOCAL_STDERR.with(move |slot| {

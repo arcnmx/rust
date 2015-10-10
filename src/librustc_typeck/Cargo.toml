@@ -8,8 +8,6 @@ name = "rustc_typeck"
 path = "lib.rs"
 
 [dependencies]
-arena = { path = "../libarena" }
-fmt_macros = { path = "../libfmt_macros" }
 rustc = { path = "../librustc" }
 rustc_front = { path = "../librustc_front" }
 rustc_platform_intrinsics = { path = "../librustc_platform_intrinsics" }

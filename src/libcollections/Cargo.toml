@@ -8,9 +8,6 @@ name = "collections"
 path = "lib.rs"
 
 [dependencies]
+core = { path = "../libcore" }
 alloc = { path = "../liballoc" }
 rustc_unicode = { path = "../librustc_unicode" }
-
-[dev-dependencies]
-std = { path = "../libstd" }
-core = { path = "../libcore" }

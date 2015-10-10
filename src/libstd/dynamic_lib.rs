@@ -113,6 +113,7 @@ impl DynamicLibrary {
 mod tests {
     use super::*;
     use prelude::v1::*;
+    use sys::c::prelude as c;
     use mem;
     use path::Path;
 
@@ -128,7 +129,7 @@ mod tests {
             Ok(libm) => libm
         };
 
-        let cosine: extern fn(libc::c_double) -> libc::c_double = unsafe {
+        let cosine: extern fn(c::c_double) -> c::c_double = unsafe {
             match libm.symbol("cos") {
                 Err(error) => panic!("Could not load function cos: {}", error),
                 Ok(cosine) => mem::transmute::<*mut u8, _>(cosine)

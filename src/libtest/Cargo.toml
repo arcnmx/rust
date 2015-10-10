@@ -11,4 +11,3 @@ path = "lib.rs"
 getopts = { path = "../libgetopts" }
 serialize = { path = "../libserialize" }
 term = { path = "../libterm" }
-libc = { path = "../liblibc" }

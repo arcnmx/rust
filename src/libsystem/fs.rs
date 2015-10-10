@@ -56,12 +56,10 @@ pub trait FilePermissions<F: Fs + ?Sized>: Sized + Clone + PartialEq + fmt::Debu
     fn mode(&self) -> F::Mode;
 }
 
-pub trait FileType<F: Fs + ?Sized>: Copy + Clone + PartialEq + Eq + hash::Hash {
+pub trait FileType: Copy + Clone + PartialEq + Eq + hash::Hash {
     fn is_dir(&self) -> bool;
     fn is_file(&self) -> bool;
     fn is_symlink(&self) -> bool;
-
-    fn is(&self, mode: F::Mode) -> bool;
 }
 
 pub trait DirBuilder<F: Fs + ?Sized> {
@@ -71,7 +69,7 @@ pub trait DirBuilder<F: Fs + ?Sized> {
     fn set_mode(&mut self, mode: F::Mode);
 }
 
-pub trait File<F: Fs + ?Sized>: io::Read + io::Write + io::Seek + AsInner<F::FileHandle> + IntoInner<F::FileHandle> + fmt::Debug {
+pub trait File<F: Fs + ?Sized>: io::Read + io::Write + io::Seek + FromInner<F::FileHandle> + AsInner<F::FileHandle> + IntoInner<F::FileHandle> + fmt::Debug {
     fn open(path: &OsStr, opts: &F::OpenOptions) -> Result<Self> where Self: Sized;
     fn open_c(path: &CStr, opts: &F::OpenOptions) -> Result<Self> where Self: Sized;
 
@@ -94,7 +92,7 @@ pub trait Fs {
     type DirEntry: DirEntry<Self>;
     type OpenOptions: OpenOptions<Self>;
     type FilePermissions: FilePermissions<Self>;
-    type FileType: FileType<Self>;
+    type FileType: FileType;
     type DirBuilder: DirBuilder<Self>;
     type FileHandle;
     type Mode;

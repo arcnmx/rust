@@ -510,23 +510,13 @@ fn translate_status(status: c_int) -> ExitStatus {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use prelude::v1::*;
 
     use ffi::OsStr;
-    use mem;
-    use ptr;
+    use core::mem;
+    use core::ptr;
+    use core::slice;
+    use unix::{c, pipe};
     use libc;
-    use slice;
-    use sys::{self, c, cvt, pipe};
-
-    macro_rules! t {
-        ($e:expr) => {
-            match $e {
-                Ok(t) => t,
-                Err(e) => panic!("received error for `{}`: {}", stringify!($e), e),
-            }
-        }
-    }
 
     #[cfg(not(target_os = "android"))]
     extern {
@@ -551,26 +541,26 @@ mod tests {
         unsafe {
             // Test to make sure that a signal mask does not get inherited.
             let cmd = Command::new(OsStr::new("cat"));
-            let (stdin_read, stdin_write) = t!(pipe::anon_pipe());
-            let (stdout_read, stdout_write) = t!(pipe::anon_pipe());
+            let (stdin_read, stdin_write) = pipe::anon_pipe().unwrap();
+            let (stdout_read, stdout_write) = pipe::anon_pipe().unwrap();
 
             let mut set: c::sigset_t = mem::uninitialized();
             let mut old_set: c::sigset_t = mem::uninitialized();
-            t!(cvt(c::sigemptyset(&mut set)));
-            t!(cvt(sigaddset(&mut set, libc::SIGINT)));
-            t!(cvt(c::pthread_sigmask(c::SIG_SETMASK, &set, &mut old_set)));
+            assert_eq!(0, c::sigemptyset(&mut set));
+            assert_eq!(0, sigaddset(&mut set, libc::SIGINT));
+            assert_eq!(0, c::pthread_sigmask(c::SIG_SETMASK, &set, &mut old_set));
 
-            let cat = t!(Process::spawn(&cmd, Stdio::Raw(stdin_read.raw()),
+            let cat = assert!(Process::spawn(&cmd, Stdio::Raw(stdin_read.raw()),
                                               Stdio::Raw(stdout_write.raw()),
-                                              Stdio::None));
+                                              Stdio::None).is_ok());
             drop(stdin_read);
             drop(stdout_write);
 
-            t!(cvt(c::pthread_sigmask(c::SIG_SETMASK, &old_set,
-                                      ptr::null_mut())));
+            assert_eq!(0, c::pthread_sigmask(c::SIG_SETMASK, &old_set,
+                                      ptr::null_mut()));
 
-            t!(cvt(libc::funcs::posix88::signal::kill(cat.id() as libc::pid_t,
-                                                      libc::SIGINT)));
+            assert_eq!(0, libc::funcs::posix88::signal::kill(cat.id() as libc::pid_t,
+                                                      libc::SIGINT));
             // We need to wait until SIGINT is definitely delivered. The
             // easiest way is to write something to cat, and try to read it
             // back: if SIGINT is unmasked, it'll get delivered when cat is
@@ -584,7 +574,7 @@ mod tests {
                 assert!(ret == 0);
             }
 
-            t!(cat.wait());
+            assert!(cat.wait().is_ok());
         }
     }
 }

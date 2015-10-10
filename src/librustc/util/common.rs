@@ -18,7 +18,7 @@ use std::fmt::Debug;
 use std::hash::Hash;
 use std::iter::repeat;
 use std::path::Path;
-use std::time::Duration;
+use std::time;
 
 use rustc_front::hir;
 use rustc_front::visit;
@@ -48,7 +48,7 @@ pub fn time<T, F>(do_it: bool, what: &str, f: F) -> T where
     let dur = {
         let ref mut rvp = rv;
 
-        Duration::span(move || {
+        time::span(move || {
             *rvp = Some(f())
         })
     };

@@ -28,19 +28,17 @@ use core::ops::Neg;
 #[cfg(target_os = "netbsd")]    pub use os::netbsd as platform;
 #[cfg(target_os = "openbsd")]   pub use os::openbsd as platform;
 
-//#[cfg(not(feature = "disable-backtrace"))]
+#[cfg(feature = "backtrace")]
 pub mod backtrace;
 
 pub mod c;
 pub mod condvar;
 pub mod dynamic_lib;
-pub mod ext;
 pub mod fd;
 pub mod fs;
 pub mod mutex;
 pub mod net;
-//pub mod os;
-//pub mod os_str;
+pub mod raw;
 pub mod path;
 pub mod pipe;
 pub mod process;

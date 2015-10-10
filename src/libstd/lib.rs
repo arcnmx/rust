@@ -360,10 +360,18 @@ pub mod thread;
 
 mod conv;
 
-mod rt;
+#[path = "rt/mod.rs"] mod util;
 
 extern crate system as sys;
-pub use sys::os;
+
+/// OS-specific functionality
+#[stable(feature = "os", since = "1.0.0")]
+pub mod os {
+    pub use sys::os::*;
+
+    #[cfg(unix)]    pub mod unix;
+    #[cfg(windows)] pub mod windows;
+}
 
 pub mod collections;
 pub mod dynamic_lib;
@@ -396,7 +404,7 @@ pub mod __rand {
             reason = "this public module should not exist and is highly likely \
                       to disappear",
             issue = "0")]
-pub mod __rt {
+pub mod rt {
     use sys::unwind::prelude::*;
     use fmt;
     use any::Any;
@@ -410,6 +418,8 @@ pub mod __rt {
     pub fn begin_unwind<M: Any + Send>(msg: M, file_line: &(&'static str, u32)) -> ! {
         Unwind::begin_unwind(msg, file_line)
     }
+
+    pub use util::rust_std_on_panic;
 }
 
 // Include a number of private modules that exist solely to provide

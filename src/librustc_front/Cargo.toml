@@ -6,9 +6,3 @@ authors = ["The Rust Project Developers"]
 [lib]
 name = "rustc_front"
 path = "lib.rs"
-
-[dependencies]
-serialize = { path = "../libserialize" }
-log = { path = "../liblog" }
-syntax = { path = "../libsyntax" }
-rustc_bitflags = { path = "../librustc_bitflags" }

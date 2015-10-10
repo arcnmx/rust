@@ -12,7 +12,7 @@ use prelude::v1::*;
 
 use cell::Cell;
 use ptr;
-use rt;
+use util;
 use sync::{StaticMutex, Arc};
 
 pub struct Lazy<T> {
@@ -51,7 +51,7 @@ impl<T: Send + Sync + 'static> Lazy<T> {
         // `Arc` allocation in our own internal box (it will get deallocated by
         // the at exit handler). Otherwise we just return the freshly allocated
         // `Arc`.
-        let registered = rt::at_exit(move || {
+        let registered = util::at_exit(move || {
             let g = self.lock.lock();
             let ptr = self.ptr.get();
             self.ptr.set(1 as *mut _);

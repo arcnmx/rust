@@ -9,7 +9,7 @@
 // except according to those terms.
 
 use mem;
-use rt;
+use util;
 use sys::rt::prelude::*;
 use thread::{self, Thread};
 
@@ -20,7 +20,7 @@ fn lang_start(main: *const u8, argc: isize, argv: *const *const u8) -> isize {
         Runtime::run_main(|| {
             thread::info::set_current_thread(Thread::new(Some("<main>".into())));
             let res = thread::catch_panic(mem::transmute::<_, fn()>(main));
-            rt::cleanup();
+            util::cleanup();
             res
         }, argc, argv).is_err()
     };

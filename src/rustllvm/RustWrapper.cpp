@@ -951,5 +951,5 @@ LLVMRustBuildLandingPad(LLVMBuilderRef Builder,
                         unsigned NumClauses,
                         const char* Name,
                         LLVMValueRef F) {
-    return LLVMBuildLandingPad(Builder, Ty, PersFn, NumClauses, Name);
+    return LLVMBuildLandingPad(Builder, Ty, NumClauses, Name);
 }

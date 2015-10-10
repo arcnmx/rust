@@ -33,7 +33,7 @@ pub mod io;
 pub mod ffi;
 pub mod fs;
 pub mod process;
-pub use unix::raw;
+pub use sys::unix::raw;
 
 /// A prelude for conveniently writing platform-specific code.
 ///

@@ -714,13 +714,6 @@ pub mod net {
     }
 
     impl sys::Socket<Net> for Socket {
-        fn socket(&self) -> &Handle { &self.0 }
-        fn into_socket(self) -> Handle {
-            let h = self.0;
-            mem::forget(self);
-            h
-        }
-
         fn socket_addr(&self) -> Result<sys::SocketAddr<Net>> {
             unsafe { rust_system_net_socket_local_addr(self.0) }
         }
@@ -752,17 +745,7 @@ pub mod net {
         }
     }
 
-    impl FromInner<Handle> for Socket {
-        fn from_inner(s: Handle) -> Self { Socket(s) }
-    }
-
-    impl IntoInner<Handle> for Socket {
-        fn into_inner(self) -> Handle { sys::Socket::into_socket(self) }
-    }
-
-    impl AsInner<Handle> for Socket {
-        fn as_inner(&self) -> &Handle { &self.0 }
-    }
+    impl_inner!(Socket(Handle): FromInner + AsInner + IntoInnerForget);
 }
 
 pub mod dynamic_lib {
@@ -1081,12 +1064,10 @@ pub mod fs {
         fn mode(&mut self, mode: Mode) { self.1 = mode }
     }
 
-    impl sys::FileType<Fs> for FileType {
+    impl sys::FileType for FileType {
         fn is_dir(&self) -> bool { panic!() }
         fn is_file(&self) -> bool { panic!() }
         fn is_symlink(&self) -> bool { panic!() }
-
-        fn is(&self, mode: Mode) -> bool { panic!() }
     }
 
     impl sys::DirBuilder<Fs> for DirBuilder {
@@ -1150,17 +1131,7 @@ pub mod fs {
         }
     }
 
-    impl AsInner<Handle> for File {
-        fn as_inner(&self) -> &Handle { &self.0 }
-    }
-
-    impl IntoInner<Handle> for File {
-        fn into_inner(self) -> Handle {
-            let h = self.0;
-            mem::forget(self);
-            h
-        }
-    }
+    impl_inner!(File(Handle): AsInner + FromInner + IntoInnerForget);
 
     impl sys::FileAttr<Fs> for FileAttr {
         fn size(&self) -> u64 { panic!() }
@@ -1284,6 +1255,8 @@ pub mod rt {
 }
 
 pub mod c {
+    use os::raw::c_char;
+
     extern {
         pub fn rust_system_rt_strlen(s: *const c_char) -> usize;
     }
@@ -1291,9 +1264,5 @@ pub mod c {
     pub const EINVAL: i32 = 22;
     pub const EIO: i32 = 5;
 
-    pub type c_char = i8;
-    pub type c_int = i32;
-    pub type c_float = f32;
-    pub type c_double = f64;
     pub use self::rust_system_rt_strlen as strlen;
 }

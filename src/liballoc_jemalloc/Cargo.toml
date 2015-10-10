@@ -10,6 +10,7 @@ name = "alloc_jemalloc"
 path = "lib.rs"
 
 [dependencies]
+core = { path = "../libcore" }
 libc = { path = "../liblibc" }
 
 [build-dependencies]

@@ -142,17 +142,8 @@ impl Socket {
     }
 }
 
-impl AsInner<c_int> for Socket {
-    fn as_inner(&self) -> &c_int { self.0.as_inner() }
-}
-
-impl FromInner<c_int> for Socket {
-    fn from_inner(fd: c_int) -> Socket { Socket(FileDesc::from_inner(fd)) }
-}
-
-impl IntoInner<c_int> for Socket {
-    fn into_inner(self) -> c_int { self.0.into_inner() }
-}
+impl_inner!(Socket(FileDesc));
+impl_inner!(Socket(FileDesc(c_int)));
 
 impl fmt::Debug for Socket {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

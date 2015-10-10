@@ -10,6 +10,3 @@ path = "lib.rs"
 [dependencies]
 serialize = { path = "../libserialize" }
 log = { path = "../liblog" }
-
-[dev-dependencies]
-test = { path = "../libtest" }

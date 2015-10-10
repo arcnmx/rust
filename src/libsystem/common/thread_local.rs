@@ -389,7 +389,6 @@ pub use self::key_imp::Key;
 
 #[cfg(test)]
 mod tests {
-    use prelude::v1::*;
     use super::{Key, StaticOsKey};
 
     fn assert_sync<T: Sync>() {}

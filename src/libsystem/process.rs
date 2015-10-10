@@ -11,7 +11,8 @@ pub mod prelude {
 
     pub type RawFd = <Process as sys_Process>::RawFd;
     pub type Command = <Process as sys_Process>::Command;
-    pub type ExitStatus = <Process as sys_Process>::ExitStatus;
+    //pub type ExitStatus = <Process as sys_Process>::ExitStatus;
+    pub use super::imp::ExitStatus;
     pub type PipeRead = <Process as sys_Process>::PipeRead;
     pub type PipeWrite = <Process as sys_Process>::PipeWrite;
 }

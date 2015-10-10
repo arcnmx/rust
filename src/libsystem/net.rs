@@ -125,9 +125,6 @@ pub trait Net {
 }
 
 pub trait Socket<N: Net + ?Sized>: FromInner<N::Socket> + AsInner<N::Socket> + IntoInner<N::Socket> {
-    fn socket(&self) -> &N::Socket;
-    fn into_socket(self) -> N::Socket where Self: Sized;
-
     fn socket_addr(&self) -> Result<SocketAddr<N>>;
 
     fn set_read_timeout(&self, dur: Option<Duration>) -> Result<()>;

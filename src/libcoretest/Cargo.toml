@@ -8,8 +8,4 @@ name = "coretest"
 path = "lib.rs"
 
 [dependencies]
-core = { path = "../libcore" }
 test = { path = "../libtest" }
-libc = { path = "../liblibc" }
-rustc_unicode = { path = "../librustc_unicode" }
-rand = { path = "../librand" }

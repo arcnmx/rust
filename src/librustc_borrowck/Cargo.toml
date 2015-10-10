@@ -8,8 +8,5 @@ name = "rustc_borrowck"
 path = "lib.rs"
 
 [dependencies]
-graphviz = { path = "../libgraphviz" }
 rustc = { path = "../librustc" }
 rustc_front = { path = "../librustc_front" }
-log = { path = "../liblog" }
-syntax = { path = "../libsyntax" }

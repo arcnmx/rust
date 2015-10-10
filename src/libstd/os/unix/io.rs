@@ -12,8 +12,13 @@
 
 #![stable(feature = "rust1", since = "1.0.0")]
 
-use inner::prelude::*;
+use sys::inner::prelude::*;
+use sys::net::prelude as sys_net;
+use sys::fs::prelude as sys_fs;
+use fs;
+use net;
 use os::raw;
+use sys;
 
 /// Raw file descriptors.
 #[stable(feature = "rust1", since = "1.0.0")]
@@ -67,4 +72,74 @@ pub trait IntoRawFd {
     /// and must close the descriptor once it's no longer needed.
     #[stable(feature = "into_raw_os", since = "1.4.0")]
     fn into_raw_fd(self) -> RawFd;
+}
+
+#[stable(feature = "rust1", since = "1.0.0")]
+impl AsRawFd for fs::File {
+    fn as_raw_fd(&self) -> RawFd {
+        *self.as_inner().as_inner()
+    }
+}
+#[stable(feature = "from_raw_os", since = "1.1.0")]
+impl FromRawFd for fs::File {
+    unsafe fn from_raw_fd(fd: RawFd) -> fs::File {
+        fs::File::from_inner(sys_fs::File::from_inner(fd))
+    }
+}
+#[stable(feature = "into_raw_os", since = "1.4.0")]
+impl IntoRawFd for fs::File {
+    fn into_raw_fd(self) -> RawFd {
+        self.into_inner().into_inner()
+    }
+}
+
+#[stable(feature = "rust1", since = "1.0.0")]
+impl AsRawFd for net::TcpStream {
+    fn as_raw_fd(&self) -> RawFd { *self.as_inner().as_inner() }
+}
+#[stable(feature = "rust1", since = "1.0.0")]
+impl AsRawFd for net::TcpListener {
+    fn as_raw_fd(&self) -> RawFd { *self.as_inner().as_inner() }
+}
+#[stable(feature = "rust1", since = "1.0.0")]
+impl AsRawFd for net::UdpSocket {
+    fn as_raw_fd(&self) -> RawFd { *self.as_inner().as_inner() }
+}
+
+#[stable(feature = "from_raw_os", since = "1.1.0")]
+impl FromRawFd for net::TcpStream {
+    unsafe fn from_raw_fd(fd: RawFd) -> net::TcpStream {
+        net::TcpStream::from_inner(FromInner::from_inner(fd))
+    }
+}
+#[stable(feature = "from_raw_os", since = "1.1.0")]
+impl FromRawFd for net::TcpListener {
+    unsafe fn from_raw_fd(fd: RawFd) -> net::TcpListener {
+        net::TcpListener::from_inner(FromInner::from_inner(fd))
+    }
+}
+#[stable(feature = "from_raw_os", since = "1.1.0")]
+impl FromRawFd for net::UdpSocket {
+    unsafe fn from_raw_fd(fd: RawFd) -> net::UdpSocket {
+        net::UdpSocket::from_inner(FromInner::from_inner(fd))
+    }
+}
+
+#[stable(feature = "into_raw_os", since = "1.4.0")]
+impl IntoRawFd for net::TcpStream {
+    fn into_raw_fd(self) -> RawFd {
+        self.into_inner().into_inner()
+    }
+}
+#[stable(feature = "into_raw_os", since = "1.4.0")]
+impl IntoRawFd for net::TcpListener {
+    fn into_raw_fd(self) -> RawFd {
+        self.into_inner().into_inner()
+    }
+}
+#[stable(feature = "into_raw_os", since = "1.4.0")]
+impl IntoRawFd for net::UdpSocket {
+    fn into_raw_fd(self) -> RawFd {
+        self.into_inner().into_inner()
+    }
 }

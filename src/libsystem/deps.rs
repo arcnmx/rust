@@ -13,7 +13,7 @@
 //! necessary for running libstd.
 
 // A few small shims in C that haven't been translated to Rust yet
-#[cfg(all(not(test), not(windows), unix))]
+#[cfg(all(not(test), not(windows), unix, feature = "rust_builtin"))]
 #[link(name = "rust_builtin", kind = "static")]
 extern {}
 
@@ -22,6 +22,12 @@ extern {}
 #[cfg(all(target_os = "linux", not(target_env = "musl")))]
 #[link(name = "dl")]
 #[link(name = "pthread")]
+extern {}
+
+#[cfg(all(not(test), feature = "backtrace",
+          any(all(unix, not(any(target_os = "macos", target_os = "ios"))),
+          all(windows, target_env = "gnu"))))]
+#[link(name = "backtrace", kind = "static")]
 extern {}
 
 #[cfg(target_os = "android")]

@@ -13,9 +13,6 @@
 #![stable(feature = "os", since = "1.0.0")]
 #![allow(missing_docs, bad_style)]
 
-#[cfg(unix)]    pub use imp::ext as unix;
-#[cfg(windows)] pub use imp::ext as windows;
-
 #[cfg(target_os = "android")]   pub mod android;
 #[cfg(target_os = "bitrig")]    pub mod bitrig;
 #[cfg(target_os = "dragonfly")] pub mod dragonfly;
@@ -24,7 +21,7 @@
 #[cfg(target_os = "linux")]     pub mod linux;
 #[cfg(target_os = "macos")]     pub mod macos;
 #[cfg(target_os = "nacl")]      pub mod nacl;
-#[cfg(target_os = "netbsd")]   pub mod netbsd;
+#[cfg(target_os = "netbsd")]    pub mod netbsd;
 #[cfg(target_os = "openbsd")]   pub mod openbsd;
 
 pub mod raw;

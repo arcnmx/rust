@@ -9,7 +9,3 @@ path = "lib.rs"
 
 [dependencies]
 core = { path = "../libcore" }
-
-[dev-dependencies]
-std = { path = "../libstd" }
-log = { path = "../liblog" }

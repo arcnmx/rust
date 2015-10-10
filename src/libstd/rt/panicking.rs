@@ -13,7 +13,7 @@ use io::prelude::*;
 use sys::unwind::prelude::*;
 use sys::backtrace::prelude::*;
 use sys::stdio::prelude as stdio;
-use rt::backtrace::BacktraceOutput as Output;
+use super::backtrace::BacktraceOutput as Output;
 
 use any::Any;
 use cell::Cell;

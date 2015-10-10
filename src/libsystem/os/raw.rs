@@ -59,9 +59,8 @@ pub enum c_void {
 
 #[cfg(test)]
 mod tests {
-    use any::TypeId;
-    use libc;
-    use mem;
+    use core::mem;
+    use core::any::TypeId;
 
     macro_rules! ok {
         ($($t:ident)*) => {$(
@@ -78,7 +77,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg(any(unix, windows))]
     fn same() {
+        use libc;
+
         use os::raw;
         ok!(c_char c_schar c_uchar c_short c_ushort c_int c_uint c_long c_ulong
             c_longlong c_ulonglong c_float c_double);
@@ -86,12 +88,14 @@ mod tests {
 
     #[cfg(unix)]
     fn unix() {
+        use libc;
+
         {
             use os::unix::raw;
             ok!(uid_t gid_t dev_t ino_t mode_t nlink_t off_t blksize_t blkcnt_t);
         }
         {
-            use sys::platform::raw;
+            use unix::platform::raw;
             ok_size!(stat);
         }
     }

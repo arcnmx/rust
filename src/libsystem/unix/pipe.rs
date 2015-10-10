@@ -29,35 +29,14 @@ pub fn anon_pipe() -> Result<(AnonPipe, AnonPipe)> {
     }
 }
 
-impl AsInner<libc::c_int> for AnonPipe {
-    fn as_inner(&self) -> &libc::c_int {
-        self.0.as_inner()
-    }
-}
-
-impl IntoInner<libc::c_int> for AnonPipe {
-    fn into_inner(self) -> libc::c_int {
-        self.0.into_inner()
-    }
-}
+impl_inner!(AnonPipe(FileDesc(libc::c_int)): AsInner + IntoInner);
+impl_inner!(AnonPipe(FileDesc));
 
 impl FromInner<libc::c_int> for AnonPipe {
     fn from_inner(fd: libc::c_int) -> Self {
         let fd = FileDesc::from_inner(fd);
         fd.set_cloexec();
         AnonPipe(fd)
-    }
-}
-
-impl AsInner<FileDesc> for AnonPipe {
-    fn as_inner(&self) -> &FileDesc {
-        &self.0
-    }
-}
-
-impl IntoInner<FileDesc> for AnonPipe {
-    fn into_inner(self) -> FileDesc {
-        self.0
     }
 }
 

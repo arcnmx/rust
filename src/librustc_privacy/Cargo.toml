@@ -10,5 +10,3 @@ path = "lib.rs"
 [dependencies]
 rustc = { path = "../librustc" }
 rustc_front = { path = "../librustc_front" }
-log = { path = "../liblog" }
-syntax = { path = "../libsyntax" }

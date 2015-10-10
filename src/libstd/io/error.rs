@@ -348,7 +348,7 @@ fn _assert_error_is_sync_send() {
 #[cfg(test)]
 mod test {
     use prelude::v1::*;
-    use sys::error::prelude::traits::*;
+    use sys::error::traits::*;
     use sys::error::prelude as sys;
     use super::{Error, ErrorKind};
     use error;
@@ -358,7 +358,8 @@ mod test {
     #[test]
     fn test_debug_error() {
         let code = 6;
-        let msg = sys::Error::from_code(code).description().as_str();
+        let msg = sys::Error::from_code(code).description();
+        let msg = msg.to_str().unwrap();
         let err = Error { repr: super::Repr::Os(sys::Error::from_code(code)) };
         let expected = format!("Error {{ repr: Os {{ code: {:?}, message: {:?} }} }}", code, msg);
         assert_eq!(format!("{:?}", err), expected);

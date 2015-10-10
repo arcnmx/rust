@@ -11,6 +11,3 @@ path = "lib.rs"
 rustc = { path = "../librustc" }
 rustc_data_structures = { path = "../librustc_data_structures" }
 rustc_front = { path = "../librustc_front" }
-syntax = { path = "../libsyntax" }
-log = { path = "../liblog" }
-graphviz = { path = "../libgraphviz" }
