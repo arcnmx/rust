@@ -21,7 +21,7 @@ impl sys::Runtime for Runtime {
         //
         // Hence, we set SIGPIPE to ignore when the program starts up in order
         // to prevent this problem.
-        assert!(signal(libc::SIGPIPE, libc::SIG_IGN) == 0);
+        signal(libc::SIGPIPE, libc::SIG_IGN);
 
         Thread::guard_init();
 

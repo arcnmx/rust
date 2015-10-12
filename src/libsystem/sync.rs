@@ -74,7 +74,7 @@ pub trait Once: marker::Sync + marker::Send {
     fn call_once<F: FnOnce()>(&'static self, f: F);
 }
 
-pub struct LockGuard<'a, L: Lock + 'a>(&'a L);
+pub struct LockGuard<'a, L: Lock + 'a>(pub &'a L);
 impl<'a, L: Lock + 'a> Drop for LockGuard<'a, L> {
     fn drop(&mut self) {
         unsafe { self.0.unlock(); }

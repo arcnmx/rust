@@ -9,6 +9,8 @@ fi
 
 ROOT="$PWD"
 TARGET="$1"
+PROFILE="debug"
+PROFILE="release"
 
 if [ $# -lt 2 ]; then
 	LLVM_CONFIG="$ROOT/$TARGET/llvm/Release/bin/llvm-config"
@@ -34,13 +36,13 @@ cargo build --manifest-path "$ROOT/Cargo.toml" --target $TARGET --features libst
 
 SYSROOT="$CARGO_TARGET_DIR/lib/rustlib/$TARGET"
 mkdir -p "$SYSROOT/lib"
-ln -sf "$CARGO_TARGET_DIR/$TARGET/debug/deps/lib"{alloc,backtrace,collections,compiler_rt,core,libc,rand,rust_builtin,rustc_bitflags,rustc_unicode,system,std}*.rlib "$SYSROOT/lib/"
-ln -sf "$CARGO_TARGET_DIR/$TARGET/debug/deps/libcompiler_rt.a" "$SYSROOT/lib/"
+ln -sf "$CARGO_TARGET_DIR/$TARGET/$PROFILE/deps/lib"{alloc,backtrace,collections,compiler_rt,core,libc,rand,rust_builtin,rustc_bitflags,rustc_unicode,system,std}*.rlib "$SYSROOT/lib/"
+ln -sf "$CARGO_TARGET_DIR/$TARGET/$PROFILE/deps/libcompiler_rt.a" "$SYSROOT/lib/"
 
 export CARGO_TARGET_DIR="$ROOT/target/non-std"
 export RUSTC_SYSROOT="$SYSROOT/../../../"
 cargo build --manifest-path "$ROOT/Cargo.toml" --target $TARGET --features deps "$@"
-ln -sf "$CARGO_TARGET_DIR/$TARGET/debug/deps/lib"{arena,collectionstest,coretest,fmt_macros,flate,getopts,graphviz,log,rbml,serialize,syntax,term,test}*.rlib "$SYSROOT/lib/"
+ln -sf "$CARGO_TARGET_DIR/$TARGET/$PROFILE/deps/lib"{arena,collectionstest,coretest,fmt_macros,flate,getopts,graphviz,log,rbml,serialize,syntax,term,test}*.rlib "$SYSROOT/lib/"
 
 export CARGO_TARGET_DIR="$ROOT/target/staging"
 export CFG_LLVM_LINKAGE_FILE="$CARGO_TARGET_DIR/$TARGET/llvmdeps.rs"

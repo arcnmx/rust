@@ -251,14 +251,14 @@ impl Builder {
         F: FnOnce() -> T, F: Send + 'static, T: Send + 'static
     {
         unsafe {
-            self.spawn_inner(Box::new(f)).map(JoinHandle)
+            self.spawn_inner(f).map(JoinHandle)
         }
     }
 
     // NB: this function is unsafe as the lifetime parameter of the code to run
     //     in the new thread is not tied into the return value, and the return
     //     value must not outlast that lifetime.
-    unsafe fn spawn_inner<'a, T: Send>(self, f: Box<FnBox() -> T + Send + 'a>)
+    unsafe fn spawn_inner<'a, T: Send, F: FnOnce() -> T + Send + 'a>(self, f: F)
                                        -> io::Result<JoinInner<T>> {
         let Builder { name, stack_size } = self;
 
@@ -271,8 +271,8 @@ impl Builder {
             = Arc::new(UnsafeCell::new(None));
         let their_packet = my_packet.clone();
 
-        unsafe extern fn main(data: usize) -> usize {
-            let f = Box::from_raw(mem::transmute::<_, *mut Box<FnBox()>>(data));
+        unsafe extern fn main<F: FnOnce()>(data: usize) -> usize {
+            let f = Box::from_raw(mem::transmute::<_, *mut F>(data));
             Runtime::run_thread(*f);
             0
         }
@@ -292,8 +292,12 @@ impl Builder {
             }));
         };
 
+        fn main_addr<F: FnOnce()>(_: &F) -> unsafe extern fn(usize) -> usize {
+            main::<F>
+        }
+
         Ok(JoinInner {
-            native: Some(try!(sys::Thread::new(stack_size, main, Box::into_raw(Box::new(Box::new(run))) as usize))),
+            native: Some(try!(sys::Thread::new(stack_size, main_addr(&run), Box::into_raw(Box::new(run)) as usize))),
             thread: my_thread,
             packet: Packet(my_packet),
         })

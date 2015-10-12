@@ -58,7 +58,7 @@ fn check_for_errors_in<T, F>(f: F) -> Result<T, String> where
     unsafe {
         // dlerror isn't thread safe, so we need to lock around this entire
         // sequence
-        let _guard = LOCK.lock();
+        let _guard = { LOCK.lock(); LockGuard(&LOCK) };
         let _old_error = dlerror();
 
         let result = f();

@@ -6,9 +6,3 @@ authors = ["The Rust Project Developers"]
 [[bin]]
 name = "compiletest"
 path = "compiletest.rs"
-
-[dependencies]
-libc = { path = "../liblibc" }
-test = { path = "../libtest" }
-getopts = { path = "../libgetopts" }
-log = { path = "../liblog" }

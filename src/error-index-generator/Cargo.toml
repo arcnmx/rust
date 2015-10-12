@@ -8,6 +8,4 @@ name = "error-index-generator"
 path = "main.rs"
 
 [dependencies]
-syntax = { path = "../libsyntax" }
 rustdoc = { path = "../librustdoc" }
-serialize = { path = "../libserialize" }

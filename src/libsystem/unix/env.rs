@@ -13,6 +13,7 @@
 #![allow(unused_imports)] // lots of cfg code here
 
 use c_str::{CString, CStr};
+use fs::prelude::*;
 use os_str::prelude::*;
 use error::prelude::*;
 use core::fmt;
@@ -378,14 +379,12 @@ pub fn current_exe() -> Result<OsString> {
 
 #[cfg(target_os = "dragonfly")]
 pub fn current_exe() -> Result<OsString> {
-    //::fs::read_link("/proc/curproc/file")
-    unimplemented!()
+    Fs::readlink(OsStr::from_str("/proc/curproc/file"))
 }
 
 #[cfg(target_os = "netbsd")]
 pub fn current_exe() -> Result<OsString> {
-    //::fs::read_link("/proc/curproc/exe")
-    unimplemented!()
+    Fs::readlink(OsStr::from_str("/proc/curproc/exe"))
 }
 
 #[cfg(any(target_os = "bitrig", target_os = "openbsd"))]
@@ -412,8 +411,7 @@ pub fn current_exe() -> Result<OsString> {
 
 #[cfg(any(target_os = "linux", target_os = "android"))]
 pub fn current_exe() -> Result<OsString> {
-    //::fs::read_link("/proc/self/exe")
-    unimplemented!()
+    Fs::readlink(OsStr::from_str("/proc/self/exe"))
 }
 
 #[cfg(any(target_os = "macos", target_os = "ios"))]
