@@ -162,7 +162,7 @@ impl fmt::Debug for UdpSocket {
             res.field("addr", &addr);
         }
 
-        let name = if cfg!(windows) {"socket"} else {"fd"};
+        let name = if cfg!(target_family = "windows") {"socket"} else {"fd"};
         res.field(name, AsInner::<sys::Socket>::as_inner(&self.0))
             .finish()
     }
@@ -171,14 +171,12 @@ impl fmt::Debug for UdpSocket {
 
 #[cfg(test)]
 mod tests {
-    use prelude::v1::*;
-
     use sys::inner::*;
     use io::ErrorKind;
     use net::*;
     use net::test::{next_test_ip4, next_test_ip6};
     use sync::mpsc::channel;
-    use time::{self, Duration};
+    use time::Duration;
     use thread;
 
     fn each_ip(f: &mut FnMut(SocketAddr, SocketAddr)) {
@@ -340,7 +338,7 @@ mod tests {
     fn debug() {
         use sys::net as sys;
 
-        let name = if cfg!(windows) {"socket"} else {"fd"};
+        let name = if cfg!(target_family = "windows") {"socket"} else {"fd"};
         let socket_addr = next_test_ip4();
 
         let udpsock = t!(UdpSocket::bind(&socket_addr));
@@ -381,11 +379,11 @@ mod tests {
     fn test_read_timeout() {
         let addr = next_test_ip4();
 
-        let mut stream = t!(UdpSocket::bind(&addr));
+        let stream = t!(UdpSocket::bind(&addr));
         t!(stream.set_read_timeout(Some(Duration::from_millis(1000))));
 
         let mut buf = [0; 10];
-        let wait = time::span(|| {
+        let wait = Duration::span(|| {
             let kind = stream.recv_from(&mut buf).err().expect("expected error").kind();
             assert!(kind == ErrorKind::WouldBlock || kind == ErrorKind::TimedOut);
         });
@@ -396,7 +394,7 @@ mod tests {
     fn test_read_with_timeout() {
         let addr = next_test_ip4();
 
-        let mut stream = t!(UdpSocket::bind(&addr));
+        let stream = t!(UdpSocket::bind(&addr));
         t!(stream.set_read_timeout(Some(Duration::from_millis(1000))));
 
         t!(stream.send_to(b"hello world", &addr));
@@ -405,7 +403,7 @@ mod tests {
         t!(stream.recv_from(&mut buf));
         assert_eq!(b"hello world", &buf[..]);
 
-        let wait = time::span(|| {
+        let wait = Duration::span(|| {
             let kind = stream.recv_from(&mut buf).err().expect("expected error").kind();
             assert!(kind == ErrorKind::WouldBlock || kind == ErrorKind::TimedOut);
         });

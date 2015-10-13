@@ -1362,7 +1362,6 @@ mod tests {
     use io::{ErrorKind, SeekFrom};
     use path::PathBuf;
     use path::Path as Path2;
-    use os;
     use rand::{self, StdRng, Rng};
     use str;
 
@@ -1439,7 +1438,7 @@ mod tests {
         let filename = &tmpdir.join("file_that_does_not_exist.txt");
         let result = File::open(filename);
 
-        if cfg!(unix) {
+        if cfg!(target_family = "unix") {
             error!(result, "o such file or directory");
         }
         // error!(result, "couldn't open path as file");
@@ -1453,7 +1452,7 @@ mod tests {
 
         let result = fs::remove_file(filename);
 
-        if cfg!(unix) {
+        if cfg!(target_family = "unix") {
             error!(result, "o such file or directory");
         }
         // error!(result, "couldn't unlink path");
@@ -1491,8 +1490,8 @@ mod tests {
         let message = "ten-four";
         let mut read_mem = [0; 4];
         let set_cursor = 4 as u64;
-        let mut tell_pos_pre_read;
-        let mut tell_pos_post_read;
+        let tell_pos_pre_read;
+        let tell_pos_post_read;
         let tmpdir = tmpdir();
         let filename = &tmpdir.join("file_rt_io_file_test_seeking.txt");
         {
@@ -1731,7 +1730,7 @@ mod tests {
     }
 
     // FIXME(#12795) depends on lstat to work on windows
-    #[cfg(not(windows))]
+    #[cfg(not(target_family = "windows"))]
     #[test]
     fn recursive_rmdir() {
         let tmpdir = tmpdir();
@@ -1878,7 +1877,7 @@ mod tests {
         check!(fs::set_permissions(&out, attr.permissions()));
     }
 
-    #[cfg(windows)]
+    #[cfg(target_family = "windows")]
     #[test]
     fn copy_file_preserves_streams() {
         let tmp = tmpdir();
@@ -1890,7 +1889,7 @@ mod tests {
         assert_eq!(v, b"carrot".to_vec());
     }
 
-    #[cfg(not(windows))] // FIXME(#10264) operation not permitted?
+    #[cfg(not(target_family = "windows"))] // FIXME(#10264) operation not permitted?
     #[test]
     fn symlinks_work() {
         let tmpdir = tmpdir();
@@ -1910,7 +1909,7 @@ mod tests {
         assert_eq!(v, b"foobar".to_vec());
     }
 
-    #[cfg(not(windows))] // apparently windows doesn't like symlinks
+    #[cfg(not(target_family = "windows"))] // apparently windows doesn't like symlinks
     #[test]
     fn symlink_noexist() {
         let tmpdir = tmpdir();
@@ -2107,7 +2106,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(not(windows))]
+    #[cfg(not(target_family = "windows"))]
     fn unlink_readonly() {
         let tmpdir = tmpdir();
         let path = tmpdir.join("file");
@@ -2135,7 +2134,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(not(windows))]
+    #[cfg(not(target_family = "windows"))]
     fn realpath_works() {
         let tmpdir = tmpdir();
         let tmpdir = fs::canonicalize(tmpdir.path()).unwrap();
@@ -2159,7 +2158,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(not(windows))]
+    #[cfg(not(target_family = "windows"))]
     fn realpath_works_tricky() {
         let tmpdir = tmpdir();
         let tmpdir = fs::canonicalize(tmpdir.path()).unwrap();

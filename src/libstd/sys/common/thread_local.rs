@@ -288,11 +288,11 @@ mod tests {
 
     #[test]
     fn smoke() {
-        assert_sync::<Key>();
-        assert_send::<Key>();
+        assert_sync::<OsKey>();
+        assert_send::<OsKey>();
 
-        let k1 = Key::new(None);
-        let k2 = Key::new(None);
+        let k1 = OsKey::new(None);
+        let k2 = OsKey::new(None);
         assert!(k1.get().is_null());
         assert!(k2.get().is_null());
         k1.set(1 as *mut _);

@@ -522,7 +522,6 @@ impl<'a> FromInner<&'a sys::IpAddrV6> for &'a Ipv6Addr {
 #[cfg(test)]
 mod tests {
     use prelude::v1::*;
-    use io;
     use net::*;
     use net::Ipv6MulticastScope::*;
     use net::test::{tsa, sa6, sa4};

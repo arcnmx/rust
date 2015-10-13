@@ -1842,7 +1842,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(unix)]
+    #[cfg(target_family = "unix")]
     pub fn test_decompositions_unix() {
         t!("",
            iter: [],
@@ -2116,7 +2116,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(windows)]
+    #[cfg(target_family = "windows")]
     pub fn test_decompositions_windows() {
         t!("",
            iter: [],
@@ -2717,7 +2717,7 @@ mod tests {
             });
         );
 
-        if cfg!(unix) {
+        if cfg!(target_family = "unix") {
             tp!("", "foo", "foo");
             tp!("foo", "bar", "foo/bar");
             tp!("foo/", "bar", "foo/bar");
@@ -2731,7 +2731,7 @@ mod tests {
             tp!("/foo/bar", "/", "/");
             tp!("/foo/bar", "/baz", "/baz");
             tp!("/foo/bar", "./baz", "/foo/bar/./baz");
-        } else {
+        } else if cfg!(target_family = "windows") {
             tp!("", "foo", "foo");
             tp!("foo", "bar", r"foo\bar");
             tp!("foo/", "bar", r"foo/bar");
@@ -2816,7 +2816,7 @@ mod tests {
         tp!("foo/.", "", true);
         tp!("foo//bar", "foo", true);
 
-        if cfg!(windows) {
+        if cfg!(target_family = "windows") {
             tp!("a\\b\\c", "a\\b", true);
             tp!("\\a", "\\", true);
             tp!("\\", "\\", false);
@@ -2864,14 +2864,14 @@ mod tests {
         tfn!("foo", "bar", "bar");
         tfn!("foo", "", "");
         tfn!("", "foo", "foo");
-        if cfg!(unix) {
+        if cfg!(target_family = "unix") {
             tfn!(".", "foo", "./foo");
             tfn!("foo/", "bar", "bar");
             tfn!("foo/.", "bar", "bar");
             tfn!("..", "foo", "../foo");
             tfn!("foo/..", "bar", "foo/../bar");
             tfn!("/", "foo", "/foo");
-        } else {
+        } else if cfg!(target_family = "windows") {
             tfn!(".", "foo", r".\foo");
             tfn!(r"foo\", "bar", r"bar");
             tfn!(r"foo\.", "bar", r"bar");
@@ -3003,7 +3003,7 @@ mod tests {
             relative_from: Some("foo/bar")
             );
 
-        if cfg!(windows) {
+        if cfg!(target_family = "windows") {
             tc!(r"C:\src\rust\cargo-test\test\Cargo.toml",
                 r"c:\src\rust\cargo-test\test",
                 eq: false,

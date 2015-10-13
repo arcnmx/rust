@@ -67,10 +67,10 @@ mod cmath {
         pub fn y1(n: c_double) -> c_double;
         pub fn yn(i: c_int, n: c_double) -> c_double;
 
-        #[cfg_attr(all(windows, target_env = "msvc"), link_name = "__lgamma_r")]
+        #[cfg_attr(all(target_family = "windows", target_env = "msvc"), link_name = "__lgamma_r")]
         pub fn lgamma_r(n: c_double, sign: &mut c_int) -> c_double;
 
-        #[cfg_attr(all(windows, target_env = "msvc"), link_name = "_hypot")]
+        #[cfg_attr(all(target_family = "windows", target_env = "msvc"), link_name = "_hypot")]
         pub fn hypot(x: c_double, y: c_double) -> c_double;
     }
 }
@@ -1605,7 +1605,7 @@ mod tests {
         assert_eq!((-0f64).frexp(), (-0f64, 0));
     }
 
-    #[test] #[cfg_attr(windows, ignore)] // FIXME #8755
+    #[test] #[cfg_attr(target_family = "windows", ignore)] // FIXME #8755
     fn test_frexp_nowin() {
         let inf: f64 = INFINITY;
         let neg_inf: f64 = NEG_INFINITY;

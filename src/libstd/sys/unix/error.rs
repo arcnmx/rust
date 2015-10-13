@@ -37,7 +37,7 @@ impl Error {
     }
 
     pub fn kind(&self) -> ErrorKind {
-        match errno as libc::c_int {
+        match self.code() as libc::c_int {
             libc::ECONNREFUSED => ErrorKind::ConnectionRefused,
             libc::ECONNRESET => ErrorKind::ConnectionReset,
             libc::EPERM | libc::EACCES => ErrorKind::PermissionDenied,

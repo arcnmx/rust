@@ -111,8 +111,6 @@ impl<'a> Drop for SemaphoreGuard<'a> {
 
 #[cfg(test)]
 mod tests {
-    use prelude::v1::*;
-
     use sync::Arc;
     use super::Semaphore;
     use sync::mpsc::channel;

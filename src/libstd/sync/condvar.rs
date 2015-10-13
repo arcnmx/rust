@@ -426,8 +426,6 @@ impl StaticCondvar {
 
 #[cfg(test)]
 mod tests {
-    use prelude::v1::*;
-
     use super::StaticCondvar;
     use sync::mpsc::channel;
     use sync::{StaticMutex, Condvar, Mutex, Arc};

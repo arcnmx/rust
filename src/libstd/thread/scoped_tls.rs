@@ -85,7 +85,7 @@ macro_rules! scoped_thread_local {
 #[allow_internal_unstable]
 macro_rules! __scoped_thread_local_inner {
     ($t:ty) => {{
-        #[cfg_attr(not(any(windows, not(no_elf_tls),
+        #[cfg_attr(not(any(target_family = "windows", not(no_elf_tls),
                            target_os = "android",
                            target_os = "ios",
                            target_os = "netbsd",
@@ -200,7 +200,7 @@ impl<T> ScopedKey<T> {
     }
 }
 
-#[cfg(not(any(windows,
+#[cfg(not(any(target_family = "windows",
               target_os = "android",
               target_os = "ios",
               target_os = "netbsd",
@@ -225,7 +225,7 @@ mod imp {
     }
 }
 
-#[cfg(any(windows,
+#[cfg(any(target_family = "windows",
           target_os = "android",
           target_os = "ios",
           target_os = "netbsd",

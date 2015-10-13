@@ -560,7 +560,7 @@ impl ToOwned for CStr {
 #[cfg(test)]
 mod tests {
     use prelude::v1::*;
-    use sys::c::prelude as libc;
+    use os::raw as libc;
     use super::*;
     use borrow::Cow::{Borrowed, Owned};
     use hash::{SipHasher, Hash, Hasher};

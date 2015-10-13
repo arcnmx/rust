@@ -167,7 +167,6 @@ impl Div<u32> for Duration {
 
 #[cfg(test)]
 mod tests {
-    use prelude::v1::*;
     use super::Duration;
 
     #[test]

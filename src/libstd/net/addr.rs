@@ -448,10 +448,7 @@ impl<'a, T: ToSocketAddrs + ?Sized> ToSocketAddrs for &'a T {
 
 #[cfg(test)]
 mod tests {
-    use prelude::v1::*;
-    use io;
     use net::*;
-    use net::Ipv6MulticastScope::*;
     use net::test::{tsa, sa6, sa4};
 
     #[test]
@@ -488,7 +485,7 @@ mod tests {
 
     // FIXME: figure out why this fails on bitrig and fix it
     #[test]
-    #[cfg(not(any(windows, target_os = "bitrig")))]
+    #[cfg(not(any(target_family = "windows", target_os = "bitrig")))]
     fn to_socket_addr_str_bad() {
         assert!(tsa("1200::AB00:1234::2552:7777:1313:34300").is_err());
     }

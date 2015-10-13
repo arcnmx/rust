@@ -545,7 +545,7 @@ mod tests {
 
     // FIXME(#10380) these tests should not all be ignored on android.
 
-    #[cfg(not(target_os="android"))]
+    #[cfg(not(target_os = "android"))]
     #[test]
     fn smoke() {
         let p = Command::new("true").spawn();
@@ -554,7 +554,7 @@ mod tests {
         assert!(p.wait().unwrap().success());
     }
 
-    #[cfg(not(target_os="android"))]
+    #[cfg(not(target_os = "android"))]
     #[test]
     fn smoke_failure() {
         match Command::new("if-this-is-a-binary-then-the-world-has-ended").spawn() {
@@ -563,7 +563,7 @@ mod tests {
         }
     }
 
-    #[cfg(not(target_os="android"))]
+    #[cfg(not(target_os = "android"))]
     #[test]
     fn exit_reported_right() {
         let p = Command::new("false").spawn();
@@ -573,7 +573,7 @@ mod tests {
         drop(p.wait());
     }
 
-    #[cfg(all(unix, not(target_os="android")))]
+    #[cfg(all(target_family = "unix", not(target_os = "android")))]
     #[test]
     fn signal_reported_right() {
         use os::unix::process::ExitStatusExt;
@@ -601,7 +601,7 @@ mod tests {
         return ret;
     }
 
-    #[cfg(not(target_os="android"))]
+    #[cfg(not(target_os = "android"))]
     #[test]
     fn stdout_works() {
         let mut cmd = Command::new("echo");
@@ -609,7 +609,7 @@ mod tests {
         assert_eq!(run_output(cmd), "foobar\n");
     }
 
-    #[cfg(all(unix, not(target_os="android")))]
+    #[cfg(all(target_family = "unix", not(target_os = "android")))]
     #[test]
     fn set_current_dir_works() {
         let mut cmd = Command::new("/bin/sh");
@@ -619,7 +619,7 @@ mod tests {
         assert_eq!(run_output(cmd), "/\n");
     }
 
-    #[cfg(all(unix, not(target_os="android")))]
+    #[cfg(all(target_family = "unix", not(target_os = "android")))]
     #[test]
     fn stdin_works() {
         let mut p = Command::new("/bin/sh")
@@ -636,7 +636,7 @@ mod tests {
     }
 
 
-    #[cfg(all(unix, not(target_os="android")))]
+    #[cfg(all(target_family = "unix", not(target_os = "android")))]
     #[test]
     fn uid_works() {
         use os::unix::prelude::*;
@@ -649,7 +649,7 @@ mod tests {
         assert!(p.wait().unwrap().success());
     }
 
-    #[cfg(all(unix, not(target_os="android")))]
+    #[cfg(all(target_family = "unix", not(target_os = "android")))]
     #[test]
     fn uid_to_root_fails() {
         use os::unix::prelude::*;
@@ -661,7 +661,7 @@ mod tests {
         assert!(Command::new("/bin/ls").uid(0).gid(0).spawn().is_err());
     }
 
-    #[cfg(not(target_os="android"))]
+    #[cfg(not(target_os = "android"))]
     #[test]
     fn test_process_status() {
         let mut status = Command::new("false").status().unwrap();
@@ -679,7 +679,7 @@ mod tests {
         }
     }
 
-    #[cfg(not(target_os="android"))]
+    #[cfg(not(target_os = "android"))]
     #[test]
     fn test_process_output_output() {
         let Output {status, stdout, stderr}
@@ -691,7 +691,7 @@ mod tests {
         assert_eq!(stderr, Vec::new());
     }
 
-    #[cfg(not(target_os="android"))]
+    #[cfg(not(target_os = "android"))]
     #[test]
     fn test_process_output_error() {
         let Output {status, stdout, stderr}
@@ -702,14 +702,14 @@ mod tests {
         assert!(!stderr.is_empty());
     }
 
-    #[cfg(not(target_os="android"))]
+    #[cfg(not(target_os = "android"))]
     #[test]
     fn test_finish_once() {
         let mut prog = Command::new("false").spawn().unwrap();
         assert!(prog.wait().unwrap().code() == Some(1));
     }
 
-    #[cfg(not(target_os="android"))]
+    #[cfg(not(target_os = "android"))]
     #[test]
     fn test_finish_twice() {
         let mut prog = Command::new("false").spawn().unwrap();
@@ -717,7 +717,7 @@ mod tests {
         assert!(prog.wait().unwrap().code() == Some(1));
     }
 
-    #[cfg(not(target_os="android"))]
+    #[cfg(not(target_os = "android"))]
     #[test]
     fn test_wait_with_output_once() {
         let prog = Command::new("echo").arg("hello").stdout(Stdio::piped())
@@ -730,25 +730,25 @@ mod tests {
         assert_eq!(stderr, Vec::new());
     }
 
-    #[cfg(all(unix, not(target_os="android")))]
+    #[cfg(all(target_family = "unix", not(target_os = "android")))]
     pub fn env_cmd() -> Command {
         Command::new("env")
     }
-    #[cfg(target_os="android")]
+    #[cfg(target_os = "android")]
     pub fn env_cmd() -> Command {
         let mut cmd = Command::new("/system/bin/sh");
         cmd.arg("-c").arg("set");
         cmd
     }
 
-    #[cfg(windows)]
+    #[cfg(target_family = "windows")]
     pub fn env_cmd() -> Command {
         let mut cmd = Command::new("cmd");
         cmd.arg("/c").arg("set");
         cmd
     }
 
-    #[cfg(not(target_os="android"))]
+    #[cfg(not(target_os = "android"))]
     #[test]
     fn test_inherit_env() {
         use env;
@@ -764,7 +764,7 @@ mod tests {
                     k, v, output);
         }
     }
-    #[cfg(target_os="android")]
+    #[cfg(target_os = "android")]
     #[test]
     fn test_inherit_env() {
         use env;

@@ -111,13 +111,12 @@ impl DynamicLibrary {
 #[cfg(all(test, not(target_os = "ios"), not(target_os = "nacl")))]
 mod tests {
     use super::*;
-    use prelude::v1::*;
-    use sys::c::prelude as c;
+    use os::raw as libc;
     use mem;
     use path::Path;
 
     #[test]
-    #[cfg_attr(any(windows,
+    #[cfg_attr(any(target_family = "windows",
                    target_os = "android",  // FIXME #10379
                    target_env = "musl"), ignore)]
     fn test_loading_cosine() {
@@ -128,7 +127,7 @@ mod tests {
             Ok(libm) => libm
         };
 
-        let cosine: extern fn(c::c_double) -> c::c_double = unsafe {
+        let cosine: extern fn(libc::c_double) -> libc::c_double = unsafe {
             match libm.symbol("cos") {
                 Err(error) => panic!("Could not load function cos: {}", error),
                 Ok(cosine) => mem::transmute::<*mut u8, _>(cosine)

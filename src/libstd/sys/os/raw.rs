@@ -22,13 +22,13 @@
 #[stable(feature = "raw_os", since = "1.1.0")] pub type c_ushort = u16;
 #[stable(feature = "raw_os", since = "1.1.0")] pub type c_int = i32;
 #[stable(feature = "raw_os", since = "1.1.0")] pub type c_uint = u32;
-#[cfg(any(target_pointer_width = "32", windows))]
+#[cfg(any(target_pointer_width = "32", target_family = "windows"))]
 #[stable(feature = "raw_os", since = "1.1.0")] pub type c_long = i32;
-#[cfg(any(target_pointer_width = "32", windows))]
+#[cfg(any(target_pointer_width = "32", target_family = "windows"))]
 #[stable(feature = "raw_os", since = "1.1.0")] pub type c_ulong = u32;
-#[cfg(all(target_pointer_width = "64", not(windows)))]
+#[cfg(all(target_pointer_width = "64", not(target_family = "windows")))]
 #[stable(feature = "raw_os", since = "1.1.0")] pub type c_long = i64;
-#[cfg(all(target_pointer_width = "64", not(windows)))]
+#[cfg(all(target_pointer_width = "64", not(target_family = "windows")))]
 #[stable(feature = "raw_os", since = "1.1.0")] pub type c_ulong = u64;
 #[stable(feature = "raw_os", since = "1.1.0")] pub type c_longlong = i64;
 #[stable(feature = "raw_os", since = "1.1.0")] pub type c_ulonglong = u64;
@@ -77,7 +77,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(any(unix, windows))]
+    #[cfg(any(target_family = "unix", target_family = "windows"))]
     fn same() {
         use libc;
 
@@ -86,7 +86,8 @@ mod tests {
             c_longlong c_ulonglong c_float c_double);
     }
 
-    #[cfg(unix)]
+    #[test]
+    #[cfg(target_family = "unix")]
     fn unix() {
         use libc;
 
@@ -95,12 +96,13 @@ mod tests {
             ok!(uid_t gid_t dev_t ino_t mode_t nlink_t off_t blksize_t blkcnt_t);
         }
         {
-            use unix::platform::raw;
+            use sys::unix::platform::raw;
             ok_size!(stat);
         }
     }
 
-    #[cfg(windows)]
+    #[test]
+    #[cfg(target_family = "windows")]
     fn windows() {
         use os::windows::raw;
     }

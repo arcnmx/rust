@@ -85,27 +85,27 @@ use mem;
 static PANIC_COUNT: StaticOsKey = StaticOsKey::new(None);
 
 // i686-pc-windows-msvc
-#[cfg(all(windows, target_arch = "x86", target_env = "msvc"))]
+#[cfg(all(target_family = "windows", target_arch = "x86", target_env = "msvc"))]
 #[path = "seh.rs"] #[doc(hidden)]
 pub mod imp;
 
 // stage0: i686-pc-windows-gnu
-#[cfg(all(stage0, windows, target_arch = "x86_64", target_env = "gnu"))]
+#[cfg(all(stage0, target_family = "windows", target_arch = "x86_64", target_env = "gnu"))]
 #[path = "seh64_gnu.rs"] #[doc(hidden)]
 pub mod imp;
 
 // stage0: x86_64-pc-windows-msvc
-#[cfg(all(stage0, windows, target_arch = "x86_64", target_env = "msvc"))]
+#[cfg(all(stage0, target_family = "windows", target_arch = "x86_64", target_env = "msvc"))]
 #[path = "seh.rs"] #[doc(hidden)]
 pub mod imp;
 
 // x86_64-pc-windows-*
-#[cfg(all(not(stage0), windows, target_arch = "x86_64"))]
+#[cfg(all(not(stage0), target_family = "windows", target_arch = "x86_64"))]
 #[path = "seh64_gnu.rs"] #[doc(hidden)]
 pub mod imp;
 
 // i686-pc-windows-gnu and all others
-#[cfg(any(unix, all(windows, target_arch = "x86", target_env = "gnu")))]
+#[cfg(any(unix, all(target_family = "windows", target_arch = "x86", target_env = "gnu")))]
 #[path = "gcc.rs"] #[doc(hidden)]
 pub mod imp;
 

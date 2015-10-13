@@ -641,7 +641,6 @@ mod tests {
     use result;
     use super::{Builder};
     use thread;
-    use time::Duration;
     use u32;
 
     // !!! These tests are dangerous. If something is buggy, they will hang, !!!

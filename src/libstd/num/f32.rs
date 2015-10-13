@@ -46,9 +46,9 @@ mod cmath {
         pub fn nextafterf(x: c_float, y: c_float) -> c_float;
         pub fn tgammaf(n: c_float) -> c_float;
 
-        #[cfg_attr(all(windows, target_env = "msvc"), link_name = "__lgammaf_r")]
+        #[cfg_attr(all(target_family = "windows", target_env = "msvc"), link_name = "__lgammaf_r")]
         pub fn lgammaf_r(n: c_float, sign: &mut c_int) -> c_float;
-        #[cfg_attr(all(windows, target_env = "msvc"), link_name = "_hypotf")]
+        #[cfg_attr(all(target_family = "windows", target_env = "msvc"), link_name = "_hypotf")]
         pub fn hypotf(x: c_float, y: c_float) -> c_float;
     }
 
@@ -1748,7 +1748,7 @@ mod tests {
         assert_eq!((-0f32).frexp(), (-0f32, 0));
     }
 
-    #[test] #[cfg_attr(windows, ignore)] // FIXME #8755
+    #[test] #[cfg_attr(target_family = "windows", ignore)] // FIXME #8755
     fn test_frexp_nowin() {
         let inf: f32 = f32::INFINITY;
         let neg_inf: f32 = f32::NEG_INFINITY;

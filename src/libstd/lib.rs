@@ -268,7 +268,6 @@
 #![feature(zero_one)]
 #![feature(drop_in_place)]
 #![feature(libc)]
-#![cfg_attr(windows, feature(str_utf16))]
 #![cfg_attr(test, feature(float_from_str_radix, range_inclusive, float_extras))]
 #![cfg_attr(test, feature(test, rustc_private))]
 #![cfg_attr(target_family = "windows", feature(str_utf16))]

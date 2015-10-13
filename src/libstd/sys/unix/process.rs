@@ -512,6 +512,8 @@ fn translate_status(status: c_int) -> ExitStatus {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use io::prelude::*;
+    use sys::inner::*;
 
     use ffi::OsStr;
     use mem;
@@ -542,7 +544,7 @@ mod tests {
     fn test_process_mask() {
         unsafe {
             // Test to make sure that a signal mask does not get inherited.
-            let cmd = Command::new(OsStr::new("cat"));
+            let cmd = Command::new(OsStr::new("cat")).unwrap();
             let (stdin_read, mut stdin_write) = pipe::anon_pipe().unwrap();
             let (mut stdout_read, stdout_write) = pipe::anon_pipe().unwrap();
 
@@ -559,7 +561,7 @@ mod tests {
             assert_eq!(0, c::pthread_sigmask(c::SIG_SETMASK, &old_set,
                                       ptr::null_mut()));
 
-            assert_eq!(0, libc::funcs::posix88::signal::kill(cat.id() as libc::pid_t,
+            assert_eq!(0, libc::funcs::posix88::signal::kill(cat.id().unwrap() as libc::pid_t,
                                                       libc::SIGINT));
             // We need to wait until SIGINT is definitely delivered. The
             // easiest way is to write something to cat, and try to read it

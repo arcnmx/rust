@@ -290,7 +290,7 @@ pub fn bind_tcp(addr: &SocketAddr) -> Result<Socket> {
     // On platforms with Berkeley-derived sockets, this allows
     // to quickly rebind a socket, without needing to wait for
     // the OS to clean up the previous one.
-    if !cfg!(windows) {
+    if !cfg!(target_family = "windows") {
         try!(setsockopt(&sock, libc::SOL_SOCKET, libc::SO_REUSEADDR,
                         1 as c_int));
     }

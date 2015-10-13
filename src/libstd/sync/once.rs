@@ -130,8 +130,6 @@ impl Once {
 
 #[cfg(test)]
 mod tests {
-    use prelude::v1::*;
-
     use thread;
     use super::Once;
     use sync::mpsc::channel;

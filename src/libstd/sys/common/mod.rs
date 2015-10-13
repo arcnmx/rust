@@ -19,8 +19,8 @@ pub mod rt;
 #[cfg(any(target_family = "unix", target_family = "windows"))] pub mod libunwind;
 #[cfg(target_family = "windows")] pub mod dwarf;
 
-#[cfg(any(all(unix, not(any(target_os = "macos", target_os = "ios"))),
-          all(windows, target_env = "gnu")))]
+#[cfg(any(all(target_family = "unix", not(any(target_os = "macos", target_os = "ios"))),
+          all(target_family = "windows", target_env = "gnu")))]
 pub mod gnu;
 
 pub mod stdio;

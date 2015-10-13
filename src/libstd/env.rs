@@ -815,7 +815,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(windows)]
+    #[cfg(target_family = "windows")]
     fn split_paths_windows() {
         fn check_parse(unparsed: &str, parsed: &[&str]) -> bool {
             split_paths(unparsed).collect::<Vec<_>>() ==
@@ -835,7 +835,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(unix)]
+    #[cfg(target_family = "unix")]
     fn split_paths_unix() {
         fn check_parse(unparsed: &str, parsed: &[&str]) -> bool {
             split_paths(unparsed).collect::<Vec<_>>() ==
@@ -850,7 +850,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(unix)]
+    #[cfg(target_family = "unix")]
     fn join_paths_unix() {
         fn test_eq(input: &[&str], output: &str) -> bool {
             &*join_paths(input.iter().cloned()).unwrap() ==
@@ -866,7 +866,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(windows)]
+    #[cfg(target_family = "windows")]
     fn join_paths_windows() {
         fn test_eq(input: &[&str], output: &str) -> bool {
             &*join_paths(input.iter().cloned()).unwrap() ==

@@ -343,7 +343,6 @@ fn _assert_error_is_sync_send() {
 
 #[cfg(test)]
 mod test {
-    use prelude::v1::*;
     use sys::error as sys;
     use super::{Error, ErrorKind};
     use error;

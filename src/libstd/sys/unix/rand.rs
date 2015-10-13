@@ -1,6 +1,6 @@
 pub use self::imp::OsRng;
 
-#[cfg(all(unix, not(target_os = "ios")))]
+#[cfg(not(target_os = "ios"))]
 mod imp {
     use self::OsRngInner::*;
 

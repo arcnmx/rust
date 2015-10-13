@@ -190,7 +190,7 @@ pub fn stdin() -> Stdin {
         // doesn't like 64k reads on stdin. See #13304 for details, but the
         // idea is that on windows we use a slightly smaller buffer that's
         // been seen to be acceptable.
-        Arc::new(Mutex::new(if cfg!(windows) {
+        Arc::new(Mutex::new(if cfg!(target_family = "windows") {
             BufReader::with_capacity(8 * 1024, stdin)
         } else {
             BufReader::new(stdin)
@@ -285,9 +285,9 @@ impl<'a> BufRead for StdinLock<'a> {
 //
 // [1]: https://tahoe-lafs.org/trac/tahoe-lafs/ticket/1232
 // [2]: http://www.mail-archive.com/log4net-dev@logging.apache.org/msg00661.html
-#[cfg(windows)]
+#[cfg(target_family = "windows")]
 const OUT_MAX: usize = 8192;
-#[cfg(unix)]
+#[cfg(not(target_family = "windows"))]
 const OUT_MAX: usize = ::usize::MAX;
 
 /// A handle to the global standard output stream of the current process.
