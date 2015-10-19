@@ -1,4 +1,4 @@
-language: c
+language: generic
 sudo: required
 dist: trusty
 
@@ -26,7 +26,3 @@ script:
 
 notifications:
   email: false
-
-branches:
-  only:
-    - master
