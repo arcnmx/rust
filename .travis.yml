@@ -18,7 +18,7 @@ addons:
       - python2.7
       - zlib1g-dev
       - libedit-dev
-      - libstdc++6=4.9*
+      - libstdc++6
       - llvm-3.7-dev
       - llvm-3.7-tools
 
