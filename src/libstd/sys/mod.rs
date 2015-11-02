@@ -13,9 +13,11 @@ pub mod common;
 
 #[cfg(target_family = "unix")] pub mod unix;
 #[cfg(target_family = "windows")] pub mod windows;
+#[cfg(target_family = "bind")] pub mod bind;
 
 #[cfg(target_family = "unix")] pub use self::unix as target;
 #[cfg(target_family = "windows")] pub use self::windows as target;
+#[cfg(target_family = "bind")] pub use self::bind as target;
 
 pub use self::target::{
     time,

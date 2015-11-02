@@ -23,6 +23,7 @@
 #![feature(no_std)]
 #![feature(staged_api)]
 
+#[cfg(any(unix, windows))]
 extern crate libc;
 
 // The minimum alignment guaranteed by the architecture. This value is used to
@@ -229,4 +230,29 @@ mod imp {
     pub fn usable_size(size: usize, _align: usize) -> usize {
         size
     }
+}
+
+#[cfg(target_family = "bind")]
+mod imp {
+	extern "C" {
+		pub fn __rust_bind_alloc_allocate(size: usize, align: usize) -> *mut u8;
+		pub fn __rust_bind_alloc_reallocate(ptr: *mut u8, old_size: usize, size: usize, align: usize) -> *mut u8;
+		pub fn __rust_bind_alloc_reallocate_inplace(ptr: *mut u8, old_size: usize, size: usize, align: usize) -> usize;
+		pub fn __rust_bind_alloc_deallocate(ptr: *mut u8, size: usize, align: usize);
+		pub fn __rust_bind_alloc_usable_size(size: usize, align: usize) -> usize;
+	}
+
+	pub use self::{
+		__rust_bind_alloc_allocate as allocate,
+		__rust_bind_alloc_reallocate as reallocate,
+		__rust_bind_alloc_reallocate_inplace as reallocate_inplace,
+		__rust_bind_alloc_deallocate as deallocate,
+	};
+
+	#[inline(always)]
+	pub fn usable_size(size: usize, align: usize) -> usize {
+		unsafe {
+			__rust_bind_alloc_usable_size(size, align)
+		}
+	}
 }
