@@ -12,7 +12,7 @@
 
 #![stable(feature = "rust1", since = "1.0.0")]
 
-use ffi::{OsStr, OsString};
+use ffi::{CStr, OsStr, OsString};
 use mem;
 use prelude::v1::*;
 use sys::os_str::Buf;
@@ -43,6 +43,10 @@ impl OsStringExt for OsString {
 /// Unix-specific extensions to `OsStr`.
 #[stable(feature = "rust1", since = "1.0.0")]
 pub trait OsStrExt {
+    /// Coerces a `&CStr` into an `OsStr` slice
+    #[unstable(feature = "unix_osstr_cstr", reason = "recently added", issue = "0")]
+    fn from_cstr(slice: &CStr) -> &Self;
+
     #[stable(feature = "rust1", since = "1.0.0")]
     fn from_bytes(slice: &[u8]) -> &Self;
 
@@ -53,9 +57,14 @@ pub trait OsStrExt {
 
 #[stable(feature = "rust1", since = "1.0.0")]
 impl OsStrExt for OsStr {
+    fn from_cstr(slice: &CStr) -> &OsStr {
+        Self::from_bytes(slice.to_bytes())
+    }
+
     fn from_bytes(slice: &[u8]) -> &OsStr {
         unsafe { mem::transmute(slice) }
     }
+
     fn as_bytes(&self) -> &[u8] {
         &self.as_inner().inner
     }
