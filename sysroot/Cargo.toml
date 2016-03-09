@@ -1,0 +1,11 @@
+[package]
+name = "sysroot"
+version = "1.0.0"
+authors = ["The Rust Project Developers"]
+
+[lib]
+path = "dummy.rs"
+
+[dependencies]
+compiler-rt = { path = "compiler-rt" }
+std = { path = "../src/libstd" }

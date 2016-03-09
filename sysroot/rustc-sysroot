@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [[ "$@" == *"build-script-build"* ]]; then
+	IS_BUILD=y
+elif [[ "$*" != *"--target"* ]]; then
+	IS_BUILD=y
+else
+	IS_BUILD=
+fi
+
+if [ -n "$IS_BUILD" ]; then
+	exec rustc "$@"
+else
+	DEPS=`echo "$*" | grep -Eo 'dependency=[^ ]*/deps' | sed 's/^dependency=/-L /' | head -n 1`
+	exec rustc --sysroot=/dev/null $DEPS "$@"
+fi

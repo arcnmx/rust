@@ -27,7 +27,7 @@ fn main() {
         build_libbacktrace(&host, &target);
     }
 
-    if target.contains("unknown-linux") {
+    if target.contains("linux") {
         if target.contains("musl") && (target.contains("x86_64") || target.contains("i686")) {
             println!("cargo:rustc-link-lib=static=unwind");
         } else {
